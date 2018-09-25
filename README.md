@@ -1,4 +1,5 @@
-# payments
+# Brief Description of the Repository
+
 This repository is the hub for a RESTful microservice that handles Payments for an eCommerce website. 
 The website is being developed by NYU's DevOps and Agile Methodologies class (Fall 2018).
 
