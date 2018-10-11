@@ -41,7 +41,7 @@ class Card(db.Model):
 	exp_month = db.Column(db.Integer)
 	exp_year = db.Column(db.Integer)
 	cvc = db.Column(db.String(4))
-	address_zip = db.Column(db.String(4))
+	address_zip = db.Column(db.String(5))
 
 
     def __repr__(self):
