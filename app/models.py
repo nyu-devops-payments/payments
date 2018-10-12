@@ -1,9 +1,14 @@
 """
 Models for Payments Microservice
+
+
 All of the models are stored in this module
+
 Models
 ------
 Card - A Card used in the Service
+
+
 Attributes:
 -----------
 number (string) - the card number, represented as a string without any separators
@@ -25,6 +30,7 @@ class DataValidationError(Exception):
 class Card(db.Model):
     """
     Class that represents a Card
+
     This version uses a relational database for persistence which is hidden
     from us by SQLAlchemy's object relational mappings (ORM)
     """
@@ -33,12 +39,11 @@ class Card(db.Model):
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
-    ch_name = db.Column(db.String(35))
-    number = db.Column(db.String(19))
-    exp_month = db.Column(db.Integer)
-    exp_year = db.Column(db.Integer)
-    cvc = db.Column(db.String(4))
-    address_zip = db.Column(db.String(5))
+	  number = db.Column(db.String(19))
+	  exp_month = db.Column(db.Integer)
+	  exp_year = db.Column(db.Integer)
+	  cvc = db.Column(db.String(4))
+	  address_zip = db.Column(db.String(5))
 
     def __repr__(self):
         return '<Card %r>' % (self.name)
@@ -59,26 +64,28 @@ class Card(db.Model):
     def serialize(self):
         """ Serializes a Card into a dictionary """
         return {"id": self.id,
-        "ch_name": self.ch_name,
-        "number": self.number,
-        "exp_month": self.exp_month,
-        "exp_year": self.exp_year,
-        "cvc": self.cvc,
-        "address_zip": self.address_zip}
+                "number": self.number,
+                "exp_month": self.exp_month,
+                "exp_year": self.exp_year,
+		"cvc": self.cvc,
+		"address_zip": self.address_zip}
+
 
     def deserialize(self, data):
         """
         Deserializes a Card from a dictionary
+
         Args:
             data (dict): A dictionary containing the Card data
         """
         try:
-            self.cardholder_name = data['ch_name']
+
             self.number = data['number']
             self.exp_month = data['exp_month']
             self.exp_year = data['exp_year']
-            self.cvc = data['cvc']
-            self.address_zip = data['address_zip']
+			self.cvc = data['cvc']
+			self.address_zip = data['address_zip']
+
         except KeyError as error:
             raise DataValidationError('Invalid card: missing ' + error.args[0])
         except TypeError as error:

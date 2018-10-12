@@ -1,5 +1,6 @@
 """
 Payments Microservice
+
 Paths:
 ------
 GET /cards - Returns a list all of the Cards
@@ -88,18 +89,20 @@ def list_cards():
     cards = []
     number = request.args.get('number')
     exp_year = request.args.get('exp_year')
-    name = request.args.get('ch_name')
+    name = request.args.get('name')
+
     if exp_year:
         cards = Card.find_by_exp_year(exp_year)
     elif number:
         cards = Card.find_by_number(number)
     elif name:
-        cards = Card.find_by_name(ch_name)         # Name on Card should be added - #Done
+        cards = Card.find_by_name(name)         # Name on Card should be added
     else:
         cards = Card.all()
 
     results = [card.serialize() for card in cards]
     return make_response(jsonify(results), status.HTTP_200_OK)
+
 
 
 ######################################################################
