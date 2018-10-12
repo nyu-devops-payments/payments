@@ -90,6 +90,7 @@ def list_cards():
     number = request.args.get('number')
     exp_year = request.args.get('exp_year')
     name = request.args.get('name')
+
     if exp_year:
         cards = Card.find_by_exp_year(exp_year)
     elif number:
@@ -102,43 +103,43 @@ def list_cards():
     results = [card.serialize() for card in cards]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
-#   UNCOMMENT FROM HERE
-# ######################################################################
-# # RETRIEVE A PET
-# ######################################################################
-# @app.route('/pets/<int:pet_id>', methods=['GET'])
-# def get_pets(pet_id):
-#     """
-#     Retrieve a single Pet
-#
-#     This endpoint will return a Pet based on it's id
-#     """
-#     pet = Pet.find(pet_id)
-#     if not pet:
-#         raise NotFound("Pet with id '{}' was not found.".format(pet_id))
-#     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
-#
-#
-# ######################################################################
-# # ADD A NEW PET
-# ######################################################################
-# @app.route('/pets', methods=['POST'])
-# def create_pets():
-#     """
-#     Creates a Pet
-#     This endpoint will create a Pet based the data in the body that is posted
-#     """
-#     check_content_type('application/json')
-#     pet = Pet()
-#     pet.deserialize(request.get_json())
-#     pet.save()
-#     message = pet.serialize()
-#     location_url = url_for('get_pets', pet_id=pet.id, _external=True)
-#     return make_response(jsonify(message), status.HTTP_201_CREATED,
-#                          {
-#                              'Location': location_url
-#                          })
-# UNCOMMENT ENDS HERE
+
+
+######################################################################
+# RETRIEVE A SINGLE CARD
+######################################################################
+@app.route('/cards/<string:number>', methods=['GET'])
+def get_cards(number):
+    """
+    Retrieves a single Card for a customer
+
+    This endpoint will return a Card based on it's number
+    """
+    card = Card.find(number)
+    if not card:
+        raise NotFound("Card Number '{}' was not found.".format(number))
+    return make_response(jsonify(card.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
+# ADD A NEW Card
+######################################################################
+@app.route('/cards', methods=['POST'])
+def create_cards():
+    """
+    Creates a Card
+    This endpoint will create a Payment source based on the Card Info in the body that is posted
+    """
+    check_content_type('application/json')
+    card = Card()
+    card.deserialize(request.get_json())
+    card.save()
+    message = card.serialize()
+    location_url = url_for('get_cards', card_id=card.id, _external=True)
+    return make_response(jsonify(message), status.HTTP_201_CREATED,
+                         {
+                             'Location': location_url
+                         })
 
 ######################################################################
 # UPDATE AN EXISTING CARD
@@ -147,7 +148,6 @@ def list_cards():
 def update_cards(card_id):
     """
     Update a Card
-
     This endpoint will update a Card based the body that is posted
     """
     check_content_type('application/json')
@@ -167,7 +167,6 @@ def update_cards(card_id):
 def delete_cards(card_id):
     """
     Delete a Card
-
     This endpoint will delete a Card based the id specified in the path
     """
     card = Card.find(card_id)
