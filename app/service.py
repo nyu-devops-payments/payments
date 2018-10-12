@@ -92,8 +92,8 @@ def list_cards():
     name = request.args.get('name')
     if exp_year:
         cards = Card.find_by_exp_year(exp_year)
-    # elif number:
-    #     cards = Card.find_by_number(number)
+    elif number:
+        cards = Card.find_by_number(number)
     elif name:
         cards = Card.find_by_name(name)         # Name on Card should be added
     else:
