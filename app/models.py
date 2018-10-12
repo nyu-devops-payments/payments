@@ -63,9 +63,11 @@ class Card(db.Model):
     def serialize(self):
         """ Serializes a Card into a dictionary """
         return {"id": self.id,
-                "name": self.name,
-                "category": self.category,
-                "available": self.available}
+                "number": self.number,
+                "exp_month": self.exp_month,
+                "exp_year": self.exp_year,
+				"cvc": self.cvc,
+				"address_zip": self.address_zip}
 
     def deserialize(self, data):
         """
