@@ -42,6 +42,7 @@ class Card(db.Model):
 	exp_year = db.Column(db.Integer)
 	cvc = db.Column(db.String(4))
 	address_zip = db.Column(db.String(5))
+	name = db.Column(db.String(50))
 
 
     def __repr__(self):
@@ -66,8 +67,9 @@ class Card(db.Model):
                 "number": self.number,
                 "exp_month": self.exp_month,
                 "exp_year": self.exp_year,
-		"cvc": self.cvc,
-		"address_zip": self.address_zip}
+				"cvc": self.cvc,
+				"address_zip": self.address_zip,
+				"name": self.name}
 
     def deserialize(self, data):
         """
@@ -82,6 +84,7 @@ class Card(db.Model):
             self.exp_year = data['exp_year']
 			self.cvc = data['cvc']
 			self.address_zip = data['address_zip']
+			self.name = data['name']
         except KeyError as error:
             raise DataValidationError('Invalid card: missing ' + error.args[0])
         except TypeError as error:
@@ -116,3 +119,30 @@ class Card(db.Model):
         """ Find a Card by its id """
         Card.logger.info('Processing lookup or 404 for id %s ...', card_id)
         return Card.query.get_or_404(card_id)
+
+    @staticmethod
+    def find_by_name(name):
+        """ Returns all Cards with the given name
+        Args:
+            name (string): the name of the Cards you want to match
+        """
+        Card.logger.info('Processing name query for %s ...', name)
+        return Card.query.filter(Card.name == name)
+
+    @staticmethod
+    def find_by_number(number):
+        """ Returns all of the Cards with the given number
+        Args:
+            number (string): the number of the Cards you want to match
+        """
+        Card.logger.info('Processing number query for %s ...', number)
+        return Card.query.filter(Card.number == number)
+
+    @staticmethod
+    def find_by_exp_year(exp_year):
+        """ Returns all of the Cards with the given expiration year
+        Args:
+            exp_year (integer): the expiration year of the Cards you want to match
+        """
+        Card.logger.info('Processing exp_year query for %s ...', exp_year)
+        return Card.query.filter(Card.exp_year == exp_year)
