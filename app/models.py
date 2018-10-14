@@ -1,11 +1,13 @@
 """
 Models for Payments Microservice
 
+
 All of the models are stored in this module
 
 Models
 ------
 Card - A Card used in the Service
+
 
 Attributes:
 -----------
@@ -37,12 +39,12 @@ class Card(db.Model):
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
-	number = db.Column(db.String(19))
-	exp_month = db.Column(db.Integer)
-	exp_year = db.Column(db.Integer)
-	cvc = db.Column(db.String(4))
-	address_zip = db.Column(db.String(5))
-	name = db.Column(db.String(50))
+	  number = db.Column(db.String(19))
+	  exp_month = db.Column(db.Integer)
+	  exp_year = db.Column(db.Integer)
+	  cvc = db.Column(db.String(4))
+	  address_zip = db.Column(db.String(5))
+	  name = db.Column(db.String(50))
 
 
     def __repr__(self):
@@ -71,6 +73,7 @@ class Card(db.Model):
 				"address_zip": self.address_zip,
 				"name": self.name}
 
+
     def deserialize(self, data):
         """
         Deserializes a Card from a dictionary
@@ -79,12 +82,14 @@ class Card(db.Model):
             data (dict): A dictionary containing the Card data
         """
         try:
+
             self.number = data['number']
             self.exp_month = data['exp_month']
             self.exp_year = data['exp_year']
-			self.cvc = data['cvc']
-			self.address_zip = data['address_zip']
-			self.name = data['name']
+			      self.cvc = data['cvc']
+			      self.address_zip = data['address_zip']
+			      self.name = data['name']
+
         except KeyError as error:
             raise DataValidationError('Invalid card: missing ' + error.args[0])
         except TypeError as error:
