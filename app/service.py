@@ -111,8 +111,7 @@ def list_cards():
 @app.route('/cards/<string:number>', methods=['GET'])
 def get_cards(number):
     """
-    Retrieves a single Card for a customer
-
+    Retrieves a single Card for a customerhn
     This endpoint will return a Card based on it's number
     """
     card = Card.find(number)
@@ -122,7 +121,7 @@ def get_cards(number):
 
 
 ######################################################################
-# ADD A NEW Card
+# ADD A NEW CARD
 ######################################################################
 @app.route('/cards', methods=['POST'])
 def create_cards():
@@ -173,6 +172,31 @@ def delete_cards(card_id):
     if card:
         card.delete()
     return make_response('', status.HTTP_204_NO_CONTENT)
+
+
+######################################################################
+#   PERFORM ACTION - CHARGE A CARD
+######################################################################
+@app.route('/cards/<int:card_id>/<float:amount>', methods=['PUT'])
+def charge_card(card_id, amount):
+    """
+    Charge a Card
+    This endpoint will charge a purchase against a card
+    """
+    card = Card.find(card_id)   # Find a card by ID
+    if not card:                # In case wrong card number was entered
+        raise NotFound("Card with id '{}' was not found.".format(card_id))
+
+    card.deserialize(request.get_json())
+    if (amount <= card.balance):     # Transaction succeeds
+        card.balance = card.balance - amount
+        card.save()
+        return make_response('', status.HTTP_202_ACCEPTED)
+    else:                            # Transaction fails due to insufficient balance
+        return make_response('', status.HTTP_406_NOT_ACCEPTED)
+
+
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
