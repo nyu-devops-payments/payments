@@ -45,6 +45,7 @@ class Card(db.Model):
 	  cvc = db.Column(db.String(4))
 	  address_zip = db.Column(db.String(5))
 	  name = db.Column(db.String(50))
+	balance = db.Column(db.Float)
 
 
     def __repr__(self):
@@ -71,7 +72,8 @@ class Card(db.Model):
                 "exp_year": self.exp_year,
 				"cvc": self.cvc,
 				"address_zip": self.address_zip,
-				"name": self.name}
+				"name": self.name,
+	       "balance": self.balance }
 
 
     def deserialize(self, data):
@@ -89,6 +91,7 @@ class Card(db.Model):
 			      self.cvc = data['cvc']
 			      self.address_zip = data['address_zip']
 			      self.name = data['name']
+				self.balance = data['balance']
 
         except KeyError as error:
             raise DataValidationError('Invalid card: missing ' + error.args[0])
