@@ -59,7 +59,7 @@ class TestCardServer(unittest.TestCase):
     def test_get_card(self):
         """ Get a single Card """
         # get the id of a card
-        
+
 
     def test_get_card_not_found(self):
         """ Get a Card thats not found """
@@ -96,7 +96,7 @@ class TestCardServer(unittest.TestCase):
     def test_update_card(self):
         """ Update an existing Card """
         card = card.find_by_number("567856785678")[0];
-        new_card5678 = dict(number="567856785678", exp_month = 12, exp_year = 2020, cvc = "321",  address_zip = "07111") 
+        new_card5678 = dict(number="567856785678", exp_month = 12, exp_year = 2020, cvc = "321",  address_zip = "07111")
         data = json.dumps(new_card5678)
         resp = self.app.put('/cards/{}'.format(card.id),
                             data=data,
@@ -106,7 +106,7 @@ class TestCardServer(unittest.TestCase):
         self.assertEqual(new_json['exp_year'], 2020)
         self.assertEqual(new_json['address_zip'], '07111')
 
-        
+
 
     def test_delete_card(self):
         """ Delete a Card """
@@ -119,7 +119,7 @@ class TestCardServer(unittest.TestCase):
         self.assertEqual(len(resp.data), 0)
         new_count = self.get_card_count()
         self.assertEqual(new_count, card_count - 1)
-        
+
 
     def test_query_card_list_by_exp_year(self):
         """ Query Cards by exp_year """
@@ -132,7 +132,22 @@ class TestCardServer(unittest.TestCase):
         data = json.loads(resp.data)
         query_item = data[0]
         self.assertEqual(query_item['exp_year'], 2020)
-        
+
+
+
+    @patch('app.service.Card.find_by_name')
+    def test_bad_request(self, bad_request_mock):
+        """ Test a Bad Request error from Find By Name """
+        bad_request_mock.side_effect = DataValidationError()
+        resp = self.app.get('/cards', query_string='name=xyz')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch('app.service.Card.find_by_name')
+    def test_mock_search_data(self, card_find_mock):
+        """ Test showing how to mock data """
+        card_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'opq'})]
+        resp = self.app.get('/cards', query_string='name=xyz')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
 
 ######################################################################
