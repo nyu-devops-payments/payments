@@ -39,12 +39,12 @@ class Card(db.Model):
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
-	  number = db.Column(db.String(19))
-	  exp_month = db.Column(db.Integer)
-	  exp_year = db.Column(db.Integer)
-	  cvc = db.Column(db.String(4))
-	  address_zip = db.Column(db.String(5))
-	  name = db.Column(db.String(50))
+	number = db.Column(db.String(19))
+	exp_month = db.Column(db.Integer)
+    exp_year = db.Column(db.Integer)
+	cvc = db.Column(db.String(4))
+	address_zip = db.Column(db.String(5))
+	name = db.Column(db.String(50))
 	balance = db.Column(db.Float)
 
 
@@ -73,7 +73,7 @@ class Card(db.Model):
 				"cvc": self.cvc,
 				"address_zip": self.address_zip,
 				"name": self.name,
-	       "balance": self.balance }
+	            "balance": self.balance }
 
 
     def deserialize(self, data):
@@ -88,10 +88,10 @@ class Card(db.Model):
             self.number = data['number']
             self.exp_month = data['exp_month']
             self.exp_year = data['exp_year']
-			      self.cvc = data['cvc']
-			      self.address_zip = data['address_zip']
-			      self.name = data['name']
-				self.balance = data['balance']
+			self.cvc = data['cvc']
+			self.address_zip = data['address_zip']
+			self.name = data['name']
+			self.balance = data['balance']
 
         except KeyError as error:
             raise DataValidationError('Invalid card: missing ' + error.args[0])
