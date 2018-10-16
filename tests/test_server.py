@@ -117,7 +117,7 @@ class TestCardServer(unittest.TestCase):
                                content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
-        new_count = self.get_pet_count()
+        new_count = self.get_card_count()
         self.assertEqual(new_count, card_count - 1)
         
 
