@@ -31,7 +31,7 @@ class TestcCards(unittest.TestCase):
 
     def test_create_a_card(self):
         """ Create a card and assert that it exists """
-        card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010")
+        card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name='Shu Tan', balance=2000)
         self.assertTrue(card != None)
         self.assertEqual(card.id, None)
         self.assertEqual(card.number, "123412341234")
@@ -45,7 +45,7 @@ class TestcCards(unittest.TestCase):
         """ Create a card and add it to the database """
         cards = Card.all()
         self.assertEqual(cards, [])
-        card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010")
+        card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name='Varsh Murali', balance=1000)
         self.assertTrue(card != None)
         self.assertEqual(card.id, None)
         card.save()
@@ -56,7 +56,7 @@ class TestcCards(unittest.TestCase):
 
     def test_update_a_card(self):
         """ Update a Card """
-        card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010")
+        card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name='Gideon Popkin', balance=1500)
         card.save()
         self.assertEqual(card.id, 1)
         # Change it an save it
@@ -71,7 +71,7 @@ class TestcCards(unittest.TestCase):
 
     def test_delete_a_card(self):
         """ Delete a Card """
-        card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010")
+        card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name='Fatima Mushtaq', balance=1000)
        	card.save()
         self.assertEqual(len(Card.all()), 1)
         # delete the card and make sure it isn't in the database
@@ -80,7 +80,7 @@ class TestcCards(unittest.TestCase):
 
     def test_serialize_a_card(self):
         """ Test serialization of a Card """
-        card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010")
+        card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name='Shu Tan', balance=2000)
         data = card.serialize()
         self.assertNotEqual(data, None)
         self.assertIn('id', data)
@@ -98,7 +98,7 @@ class TestcCards(unittest.TestCase):
 
     def test_deserialize_a_card(self):
         """ Test deserialization of a Card """
-        data = {"id":1,"number":"567856785678","exp_month":8,"exp_year":2010,"cvc":"321","address_zip":"10010"}
+        data = {"id":1,"number":"567856785678","exp_month":8,"exp_year":2010,"cvc":"321","address_zip":"10010","name":"sfvg","balance":"1000"}
         card = Card()
         card.deserialize(data)
         self.assertNotEqual(card, None)
@@ -108,6 +108,8 @@ class TestcCards(unittest.TestCase):
         self.assertEqual(card.exp_year, 2010)
         self.assertEqual(card.cvc, "321")
         self.assertEqual(card.address_zip, "10010")
+        self.assertEqual(card.name, "sfvg")
+        self.assertEqual(card.balance, "1000")
 
     def test_deserialize_bad_data(self):
         """ Test deserialization of bad data """
@@ -117,8 +119,7 @@ class TestcCards(unittest.TestCase):
 
     def test_find_card(self):
         """ Find a Card by ID """
-        Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010").save()
-        card5678 = Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07110")
+        card5678 = Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07110", name='Fatima M', balance=2000)
         card5678.save()
         card = Card.find(card5678.id)
         self.assertIsNot(card, None)
@@ -129,7 +130,9 @@ class TestcCards(unittest.TestCase):
         self.assertEqual(card.cvc, "321")
         self.assertEqual(card.address_zip, "07110")
 
-
+    def test_find_or_404(self):
+        card = Card.find_or_404(0)
+        self.assertIs(card, None)
 
 
 ######################################################################

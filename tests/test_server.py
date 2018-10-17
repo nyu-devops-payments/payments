@@ -33,9 +33,12 @@ class TestCardServer(unittest.TestCase):
         service.init_db()
         db.drop_all()    # clean up the last tests
         db.create_all()  # create new tables
-        Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name = 'nick1', balance = 100.9).save()
-        Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07100", name = 'nick2nick', balance = 200).save()
-        Card(number="345634563456", exp_month = 9, exp_year = 2020, cvc = "323",  address_zip = "07100", name = 'nick3nicknick', balance = 300.5).save()
+
+        Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name="Shu Tan", balance="2000").save()
+        Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07100", name="Fatima M", balance="2000").save()
+        Card(number="345634563456", exp_month = 9, exp_year = 2020, cvc = "323",  address_zip = "07100", name="Varsha Murali", balance="2000").save()
+        Card(number="345634563456", exp_month = 11, exp_year = 2021, cvc = "311",  address_zip = "07110", name="Gedeon Popkin", balance="2000").save()
+
         self.app = service.app.test_client()
 
     def tearDown(self):
@@ -54,25 +57,36 @@ class TestCardServer(unittest.TestCase):
         resp = self.app.get('/cards')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
-        self.assertEqual(len(data), 3)
+        self.assertEqual(len(data), 4)
 
     def test_get_card(self):
         """ Get a single Card """
         # get the id of a card
+        resp = self.app.get('/cards/2')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
         card = Card.find_by_number('123412341234')[0]
-        print(card.name)
         resp = self.app.get('/cards/{}'.format(card.id),
                             content_type='application/json')
-        print(resp.status_code)
+       
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
         self.assertEqual(data['name'], card.name)
+
 
 
     def test_get_card_not_found(self):
         """ Get a Card thats not found """
         resp = self.app.get('/cards/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
+    def test_get_card_by_name(self):
+        """ Get Card by Card Holder Name """
+        # get the id of a card
+        resp = self.app.get('/cards', query_string='name=Fatima M')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
 
     def test_create_card(self):
         """ Create a new Card """
@@ -175,13 +189,12 @@ class TestCardServer(unittest.TestCase):
 
 
 
-
 ######################################################################
 # Utility functions
 ######################################################################
 
     def get_card_count(self):
-        """ save the current number of cardss """
+        """ save the current number of cards """
         resp = self.app.get('/cards')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
@@ -204,6 +217,17 @@ class TestCardServer(unittest.TestCase):
         card_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'xyz'})]
         resp = self.app.get('/cards', query_string='name=xyz')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    @patch('app.service.Card.deserialize')
+    def test_mock_deserialize_data(self, bad_request_mock):
+        """ Test a Bad Request - Deserialization Error """
+        bad_request_mock.side_effect = DataValidationError()
+        resp = self.app.get('/cards', query_string='number=null')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_method_not_allowed(self):
+        resp = self.app.put('/cards')
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 ######################################################################
