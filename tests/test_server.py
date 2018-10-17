@@ -147,6 +147,25 @@ class TestCardServer(unittest.TestCase):
         return len(data)
 
 ######################################################################
+# Patch Mock Tests
+######################################################################
+
+    @patch('app.service.Card.find_by_name')
+    def test_bad_request(self, bad_request_mock):
+        """ Test a Bad Request error from Find By Name """
+        bad_request_mock.side_effect = DataValidationError()
+        resp = self.app.get('/cards', query_string='name=xyz')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch('app.service.Card.find_by_name')
+    def test_mock_search_data(self, card_find_mock):
+        """ Test showing how to mock data """
+        card_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'xyz'})]
+        resp = self.app.get('/cards', query_string='name=xyz')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+
+######################################################################
 #   M A I N
 ######################################################################
 if __name__ == '__main__':
