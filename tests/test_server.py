@@ -35,10 +35,8 @@ class TestCardServer(unittest.TestCase):
         db.create_all()  # create new tables
         Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010").save()
         Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07100").save()
-<<<<<<< HEAD
-=======
         Card(number="345634563456", exp_month = 9, exp_year = 2020, cvc = "323",  address_zip = "07100").save()
->>>>>>> 129370e9a36b8ff4514fecdd78e39bc581ac7beb
+
         self.app = service.app.test_client()
 
     def tearDown(self):
