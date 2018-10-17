@@ -34,7 +34,7 @@ class TestCardServer(unittest.TestCase):
         db.drop_all()    # clean up the last tests
         db.create_all()  # create new tables
         Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010").save()
-        Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07100").save()
+        Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07100",name = 'nick2', balance = 300.0).save()
         Card(number="345634563456", exp_month = 9, exp_year = 2020, cvc = "323",  address_zip = "07100").save()
 
         self.app = service.app.test_client()
@@ -72,13 +72,14 @@ class TestCardServer(unittest.TestCase):
         # save the current number of cards for later comparison
         card_count = self.get_card_count()
         # add a new card
-        Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07100").save()
+        #Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07100").save()
 
-        new_card = dict(number='333344445555', exp_month=8,exp_year=2025,cvc='789', address_zip = '10020')
+        new_card = dict(number='333344445555', exp_month=8,exp_year=2025,cvc='789', address_zip = '10020', name = 'nick', balance = 50.0)
         data = json.dumps(new_card)
         resp = self.app.post('/cards',
                              data=data,
                              content_type='application/json')
+
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
@@ -97,8 +98,8 @@ class TestCardServer(unittest.TestCase):
     def test_update_card(self):
         """ Update an existing Card """
 
-        card = card.find_by_number("567856785678")[0];
-        new_card5678 = dict(number="567856785678", exp_month = 12, exp_year = 2020, cvc = "321",  address_zip = "07111") 
+        card = Card.find_by_number("567856785678")[0];
+        new_card5678 = dict(number="567856785678", exp_month = 12, exp_year = 2020, cvc = "321",  address_zip = "07111",name = 'nnick', balance = 1000.0) 
         data = json.dumps(new_card5678)
         resp = self.app.put('/cards/{}'.format(card.id),
                             data=data,
@@ -107,6 +108,8 @@ class TestCardServer(unittest.TestCase):
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['exp_year'], 2020)
         self.assertEqual(new_json['address_zip'], '07111')
+        self.assertEqual(new_json['name'], 'nnick')
+        self.assertEqual(new_json['balance'], 1000.0)
         
 
     def test_delete_card(self):

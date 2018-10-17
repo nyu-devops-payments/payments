@@ -134,7 +134,7 @@ def create_cards():
     card.deserialize(request.get_json())
     card.save()
     message = card.serialize()
-    location_url = url_for('get_cards', card_id=card.id, _external=True)
+    location_url = url_for('get_cards', number=card.number, _external=True)
     return make_response(jsonify(message), status.HTTP_201_CREATED,
                          {
                              'Location': location_url
