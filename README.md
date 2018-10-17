@@ -46,6 +46,10 @@ This endpoint will create a Payment source based on the Card Info in the body th
 This endpoint will update a Card based the body that is posted.
 
     PUT /cards/{number}
+    
+#### Route Parameters
+
+**number** (INTEGER) The card ID
 
 #### HTTP Request Body Example
 
@@ -57,11 +61,7 @@ This endpoint will update a Card based the body that is posted.
         address_zip: "12345",
         balance: 12.12
     }
-    
-#### Route Parameters
-
-**number** (INTEGER) The card ID
-
+  
 #### HTTP Request Body Example
 
     {
