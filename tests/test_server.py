@@ -166,11 +166,12 @@ class TestCardServer(unittest.TestCase):
         self.assertEqual(query_item['exp_year'], 2019)
 
     def test_charge_card(self):
-        card = Card.find_by_number('123412341234')[0];
+        card = Card.find_by_number('567856785678')[0];
         resp = self.app.put('/cards/{}'.format(card.id)+'/{}'.format(20.5))
+        
         print('/cards/{}'.format(card.id)+'/{}'.format(20.5))
-        self.assertEqual(card.name, 'nick1')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        
+        self.assertEqual(resp.status_code, status.HTTP_202_ACCEPTED)
 
 
 
