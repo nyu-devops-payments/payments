@@ -16,7 +16,7 @@ exp_month (integer) - the card expiration month, represented as an integer
 exp_year (integer) - the card expiration year, represented as an integer
 cvc (string) - the card security code, represented as an string (so that if the leading digit is 0, it is still stored correctly)
 address_zip (string) - the card billing zip code, represented as a string (so that if the leading digit is 0, it is still stored correctly)
-balance (float) the card balance, represented as a float
+balance (float) - the card balance, represented as a float
 """
 import logging
 from flask_sqlalchemy import SQLAlchemy
