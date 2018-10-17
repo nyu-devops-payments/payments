@@ -92,3 +92,7 @@ This endpoint will charge a purchase against a card.
 **number** (INTEGER) The card ID
 
 **amount** (FLOAT) The amount to charge
+
+
+#### Test Code Coverage
+A code coverage of 93% has been achieved for the Payments API. Testing all endpoints + mock tests for bad requests.
