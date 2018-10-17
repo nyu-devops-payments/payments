@@ -33,6 +33,7 @@ class TestCardServer(unittest.TestCase):
         service.init_db()
         db.drop_all()    # clean up the last tests
         db.create_all()  # create new tables
+
         Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name="Shu Tan", balance="2000").save()
         Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07100", name="Fatima M", balance="2000").save()
         Card(number="345634563456", exp_month = 9, exp_year = 2020, cvc = "323",  address_zip = "07100", name="Varsha Murali", balance="2000").save()
@@ -63,6 +64,15 @@ class TestCardServer(unittest.TestCase):
         # get the id of a card
         resp = self.app.get('/cards/2')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        card = Card.find_by_number('123412341234')[0]
+        resp = self.app.get('/cards/{}'.format(card.id),
+                            content_type='application/json')
+       
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = json.loads(resp.data)
+        self.assertEqual(data['name'], card.name)
+
 
 
     def test_get_card_not_found(self):
@@ -144,6 +154,39 @@ class TestCardServer(unittest.TestCase):
         data = json.loads(resp.data)
         query_item = data[0]
         self.assertEqual(query_item['exp_year'], 2020)
+
+    def test_query_card_list_by_name(self):
+
+        """ Query Cards by exp_year """
+        resp = self.app.get('/cards',
+                            query_string='name=nick1')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(resp.data), 0)
+        self.assertIn('123412341234', resp.data)
+        data = json.loads(resp.data)
+        query_item = data[0]
+        self.assertEqual(query_item['exp_year'], 2019)
+
+    def test_query_card_list_by_number(self):
+
+        """ Query Cards by exp_year """
+        resp = self.app.get('/cards',
+                            query_string='number=123412341234')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(resp.data), 0)
+        self.assertIn('123412341234', resp.data)
+        data = json.loads(resp.data)
+        query_item = data[0]
+        self.assertEqual(query_item['exp_year'], 2019)
+
+    def test_charge_card(self):
+        card = Card.find_by_number('123412341234')[0];
+        resp = self.app.put('/cards/{}'.format(card.id)+'/{}'.format(20.5))
+        print('/cards/{}'.format(card.id)+'/{}'.format(20.5))
+        self.assertEqual(card.name, 'nick1')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+
 
 
 ######################################################################

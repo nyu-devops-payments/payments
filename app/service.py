@@ -108,12 +108,13 @@ def list_cards():
 ######################################################################
 # RETRIEVE A SINGLE CARD
 ######################################################################
-@app.route('/cards/<string:number>', methods=['GET'])
+@app.route('/cards/<int:number>', methods=['GET'])
 def get_cards(number):
     """
     Retrieves a single Card for a customerhn
     This endpoint will return a Card based on it's number
     """
+    check_content_type
     card = Card.find(number)
     if not card:
         raise NotFound("Card Number '{}' was not found.".format(number))
@@ -184,7 +185,7 @@ def charge_card(card_id, amount):
     This endpoint will charge a purchase against a card
     """
     card = Card.find(card_id)   # Find a card by ID
-    if not card:                # In case wrong card number was entered
+    if not card:           # In case wrong card number was entered
         raise NotFound("Card with id '{}' was not found.".format(card_id))
 
     card.deserialize(request.get_json())
