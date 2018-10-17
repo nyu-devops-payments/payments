@@ -114,7 +114,16 @@ class TestCardServer(unittest.TestCase):
 
     def test_delete_card(self):
         """ Delete a Card """
-
+        """ Delete a Card """
+        card = Card.find_by_number("123412341234")[0];
+        # save the current number of cards for later comparrison
+        card_count = self.get_card_count()
+        resp = self.app.delete('/cards/{}'.format(card.id),
+                               content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        new_count = self.get_card_count()
+        self.assertEqual(new_count, card_count - 1)
         
         # save the current number of cards for later comparrison
         
