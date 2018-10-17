@@ -1,5 +1,9 @@
 # Payments Microservice
 
+[![Build Status](https://travis-ci.org/nyu-devops/nyu-devops-payments/payments.svg?branch=master)](https://travis-ci.org/nyu-devops/nyu-devops-payments/payments)
+[![Codecov](https://codecov.io/gh/nyu-devops/nyu-devops-payments/payments/branch/master/graph/badge.svg)](https://codecov.io/gh/nyu-devops/nyu-devops-payments/payments/branch/master/graph/badge.svg)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ## Introduction
 
 This repository is the hub for a RESTful microservice that handles Payments for an eCommerce website. 
