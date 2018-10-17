@@ -131,7 +131,7 @@ class TestcCards(unittest.TestCase):
         self.assertEqual(card.address_zip, "07110")
 
     def test_find_or_404(self):
-        card = Card.find_or_404(0)
+        card = Card.find_or_404(100)
         self.assertIs(card, None)
 
 

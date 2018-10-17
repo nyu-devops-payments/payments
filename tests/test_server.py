@@ -34,10 +34,10 @@ class TestCardServer(unittest.TestCase):
         db.drop_all()    # clean up the last tests
         db.create_all()  # create new tables
 
-        Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name="Shu Tan", balance="2000").save()
-        Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07100", name="Fatima M", balance="2000").save()
-        Card(number="345634563456", exp_month = 9, exp_year = 2020, cvc = "323",  address_zip = "07100", name="Varsha Murali", balance="2000").save()
-        Card(number="345634563456", exp_month = 11, exp_year = 2021, cvc = "311",  address_zip = "07110", name="Gedeon Popkin", balance="2000").save()
+        Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name="nick1", balance= 200.5).save()
+        Card(number="567856785678", exp_month = 12, exp_year = 2022, cvc = "321",  address_zip = "07100", name="Fatima M", balance= 3000).save()
+        Card(number="345634563456", exp_month = 9, exp_year = 2020, cvc = "323",  address_zip = "07100", name="Varsha Murali", balance= 2000).save()
+        Card(number="345634563456", exp_month = 11, exp_year = 2021, cvc = "311",  address_zip = "07110", name="Gedeon Popkin", balance= 500).save()
 
         self.app = service.app.test_client()
 
@@ -179,6 +179,12 @@ class TestCardServer(unittest.TestCase):
         query_item = data[0]
         self.assertEqual(query_item['exp_year'], 2019)
 
+    def test_charge_card_not_found(self):
+        
+        resp = self.app.put('/cards/{}'.format(100)+'/{}'.format(20.5))
+        
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_charge_card(self):
         card = Card.find_by_number('567856785678')[0];
         resp = self.app.put('/cards/{}'.format(card.id)+'/{}'.format(20.5))
@@ -219,12 +225,12 @@ class TestCardServer(unittest.TestCase):
         resp = self.app.get('/cards', query_string='name=xyz')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-    @patch('app.service.Card.deserialize')
-    def test_mock_deserialize_data(self, bad_request_mock):
-        """ Test a Bad Request - Deserialization Error """
-        bad_request_mock.side_effect = DataValidationError()
-        resp = self.app.get('/cards', query_string='number=null')
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+    # @patch('app.service.Card.deserialize')
+    # def test_mock_deserialize_data(self, bad_request_mock):
+    #     """ Test a Bad Request - Deserialization Error """
+    #     bad_request_mock.side_effect = DataValidationError()
+    #     resp = self.app.get('/cards', query_string='number=null')
+    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_method_not_allowed(self):
         resp = self.app.put('/cards')

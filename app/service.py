@@ -185,7 +185,6 @@ def charge_card(card_id, amount):
     This endpoint will charge a purchase against a card
     """
      
-
     card = Card.find(card_id)   # Find a card by ID
     if not card:           # In case wrong card number was entered
         raise NotFound("Card with id '{}' was not found.".format(card_id))
