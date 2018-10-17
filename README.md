@@ -12,7 +12,7 @@ The Payments resource is responsible for processing all payment-related operatio
 This service requires [VirtualBox](https://www.virtualbox.org/) and [VirtualBox](https://www.virtualbox.org/) to run. After installing the software, you can clone the repo and run the tests by using the following commands.
 
     git clone https://github.com/nyu-devops-payments/payments.git
-    cd lab-flask-tdd
+    cd payments
     vagrant up
     vagrant ssh
     cd /vagrant
