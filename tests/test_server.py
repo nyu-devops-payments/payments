@@ -128,6 +128,17 @@ class TestCardServer(unittest.TestCase):
         self.assertEqual(new_json['exp_year'], 2020)
         self.assertEqual(new_json['address_zip'], '07111')
 
+    def test_update_card_not_found(self):
+        """ Update an existing Card """
+        card = Card.find_by_number("123412341234")[0];
+        new_card5678 = dict(number="123412341234", exp_month = 12, exp_year = 2020, cvc = "321",  address_zip = "07111", name='xyzba', balance=50)
+        data = json.dumps(new_card5678)
+        resp = self.app.put('/cards/{}'.format(0),
+                            data=data,
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        
+
 
 
     def test_delete_card(self):
@@ -182,18 +193,17 @@ class TestCardServer(unittest.TestCase):
     def test_charge_card_not_found(self):
         
         resp = self.app.put('/cards/{}'.format(100)+'/{}'.format(20.5))
-        
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_charge_card(self):
         card = Card.find_by_number('567856785678')[0];
         resp = self.app.put('/cards/{}'.format(card.id)+'/{}'.format(20.5))
-        
-        print('/cards/{}'.format(card.id)+'/{}'.format(20.5))
-        
         self.assertEqual(resp.status_code, status.HTTP_202_ACCEPTED)
 
-
+    def test_charge_card_not_acceptable(self):
+        card = Card.find_by_number('567856785678')[0];
+        resp = self.app.put('/cards/{}'.format(card.id)+'/{}'.format(3320.5))
+        self.assertEqual(resp.status_code, status.HTTP_406_NOT_ACCEPTABLE)
 
 
 ######################################################################

@@ -184,7 +184,6 @@ def charge_card(card_id, amount):
     Charge a Card
     This endpoint will charge a purchase against a card
     """
-     
     card = Card.find(card_id)   # Find a card by ID
     if not card:           # In case wrong card number was entered
         raise NotFound("Card with id '{}' was not found.".format(card_id))
@@ -193,8 +192,8 @@ def charge_card(card_id, amount):
         card.balance = card.balance - amount
         card.save()
         return make_response('', status.HTTP_202_ACCEPTED)
-    else:                            # Transaction fails due to insufficient balance
-        return make_response('', status.HTTP_406_NOT_ACCEPTED)
+    else:                        # Transaction fails due to insufficient balance
+        return make_response('', status.HTTP_406_NOT_ACCEPTABLE)
 
 
 

@@ -3,6 +3,7 @@ import os
 from app.models import Card, DataValidationError, db
 from app import app
 
+DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -129,10 +130,6 @@ class TestcCards(unittest.TestCase):
         self.assertEqual(card.exp_year, 2022)
         self.assertEqual(card.cvc, "321")
         self.assertEqual(card.address_zip, "07110")
-
-    def test_find_or_404(self):
-        card = Card.find_or_404(100)
-        self.assertIs(card, None)
 
 
 ######################################################################
