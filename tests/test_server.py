@@ -55,7 +55,7 @@ class TestCardServer(unittest.TestCase):
         resp = self.app.get('/cards')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
-        self.assertEqual(len(data), 2)
+        self.assertEqual(len(data), 3)
 
     def test_get_card(self):
         """ Get a single Card """
