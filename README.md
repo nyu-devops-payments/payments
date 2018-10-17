@@ -45,12 +45,12 @@ This endpoint will create a Payment source based on the Card Info in the body th
 #### HTTP Request Body Example
 
     {
-        number: "4242424242424242",
-        exp_month: 5,
-        exp_year: 2020,
-        cvc: "123"
-        address_zip: "12345",
-        balance: 105.00
+        "number": "4242424242424242",
+        "exp_month": 5,
+        "exp_year": 2020,
+        "cvc": "123"
+        "address_zip": "12345",
+        "balance": 105.00
     }
    
 ### Update an Existing Card
@@ -65,12 +65,12 @@ This endpoint will update a Card based the body that is posted.
 #### HTTP Request Body Example
 
     {
-        number: "4242424242424242",
-        exp_month: 5,
-        exp_year: 2020,
-        cvc: "123"
-        address_zip: "12345",
-        balance: 105.00
+        "number": "4242424242424242",
+        "exp_month": 5,
+        "exp_year": 2020,
+        "cvc": "123"
+        "address_zip": "12345",
+        "balance": 105.00
     }
 
 ### Delete a Card
