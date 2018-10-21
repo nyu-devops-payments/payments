@@ -72,8 +72,9 @@ This endpoint will update a Card based the body that is posted.
         "number": "4242424242424242",
         "exp_month": 5,
         "exp_year": 2020,
-        "cvc": "123"
+        "cvc": "123",
         "address_zip": "12345",
+        "name": "Dennis John",
         "balance": 105.00
     }
 
