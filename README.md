@@ -52,8 +52,9 @@ This endpoint will create a Payment source based on the Card Info in the body th
         "number": "4242424242424242",
         "exp_month": 5,
         "exp_year": 2020,
-        "cvc": "123"
+        "cvc": "123",
         "address_zip": "12345",
+        "name": "Dennis John",
         "balance": 105.00
     }
    
