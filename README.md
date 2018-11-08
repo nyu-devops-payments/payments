@@ -6,7 +6,7 @@
 
 ## Introduction
 
-This repository is the hub for a RESTful microservice that handles Payments for an eCommerce website. 
+This repository is the hub for a RESTful Micro-Service that handles Payments for an eCommerce website.
 The website is being developed by NYU's DevOps and Agile Methodologies class (Fall 2018).
 
 The Payments resource is responsible for processing all payment-related operations. These include operations such as a customer picking his/her payment method, payment authorization, printing/emailing receipts, etc.
@@ -27,42 +27,40 @@ This service requires [VirtualBox](https://www.virtualbox.org/) and [VirtualBox]
 
 Below are the available endpoints of this microservice.
 
-### List All Cards
+### List All Payments
 This endpoint returns all of the Cards.
 
-    GET /cards
+    GET /payments
 
 ### Retrieve a Single Card
 This endpoint will return a Card based on its number.
 
-    GET /cards/{number}
+    GET /payments/{number}
 
 #### Route Parameters
 
-**number** (INTEGER) The card ID
+**id** (INTEGER) The Payment ID
 
-### Add a New Card
-This endpoint will create a Payment source based on the Card Info in the body that is posted.
+### Add a New Payment
+This endpoint will create a Payment source based on the Payment Info in the body that is posted.
 
-    POST /cards
+    POST /payments
 
 #### HTTP Request Body Example
-
     {
-        "number": "4242424242424242",
-        "exp_month": 5,
-        "exp_year": 2020,
-        "cvc": "123",
-        "address_zip": "12345",
-        "name": "Dennis John",
-        "balance": 105.00
+        "customer_id": 12302,
+        "order_id": 11150,
+        "payment_method_type": "CREDIT",
+        "payment_status": "PAID"
+        "default_payment_type": False,
     }
-   
-### Update an Existing Card
+
+
+### Update an Existing Payment  (#Todo Varsha)
 This endpoint will update a Card based the body that is posted.
 
     PUT /cards/{number}
-    
+
 #### Route Parameters
 
 **number** (INTEGER) The card ID
@@ -79,7 +77,7 @@ This endpoint will update a Card based the body that is posted.
         "balance": 105.00
     }
 
-### Delete a Card
+### Delete a Payment  (#Todo Shu)
 This endpoint will delete a Card based the id specified in the path.
 
     DELETE /cards/{number}
@@ -88,7 +86,8 @@ This endpoint will delete a Card based the id specified in the path.
 
 **number** (INTEGER) The card ID
 
-### Perform Action - Charge a Card
+
+### Perform Action - Set a Payment as Default  (#Todo Gideon)
 This endpoint will charge a purchase against a card.
 
     PUT /cards/{number}/{amount}
