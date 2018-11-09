@@ -1,26 +1,28 @@
 """
-Payments Microservice
+Payments Microservice API
 
-Paths:
+URLs:
 ------
-GET /cards - Returns a list all of the Cards
-GET /cards/{id} - Returns the Card with a given id number
-POST /cards - creates a new Card record in the database
-PUT /cards/{id} - updates a Card record in the database
-DELETE /cards/{id} - deletes a Card record in the database
+GET /payments - Returns a list of all Payments of all customers
+GET /payments/{id} - Returns the Payment with a given id number
+POST /payments - creates a new Payment record in database
+PUT /payments/{order_id} - updates a Payment record in database
+DELETE /payments/{id} - deletes a Payment record in database
 """
 
 
 import os
 import sys
 import logging
+import make_enum_json_serializable  # ADDED
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 
 # We use SQLAlchemy that supports SQLite, MySQL and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from models import Card, DataValidationError
+from models import Payment, PaymentMethodType, PaymentStatus, DataValidationError
+
 
 # Import Flask application
 from . import app
@@ -77,124 +79,126 @@ def index():
     """ Root URL response """
     return jsonify(name='Payments REST API Service',
                    version='1.0',
-                   paths=url_for('list_cards', _external=True)
+                   paths=url_for('list_payments', _external=True)
                   ), status.HTTP_200_OK
 
 ######################################################################
-# LIST ALL CARDS
+# LIST ALL PAYMNETS
 ######################################################################
-@app.route('/cards', methods=['GET'])
-def list_cards():
-    """ Returns all of the Cards """
-    cards = []
-    number = request.args.get('number')
-    exp_year = request.args.get('exp_year')
-    name = request.args.get('name')
+@app.route('/payments', methods=['GET'])
+def list_payments():
+    """ Returns all Payments of all Customers """
+    payments = []
+    customer_id = request.args.get('customer_id')
+    order_id = request.args.get('order_id')
+    payment_method_type = request.args.get('payment_method_type')
+    payment_status = request.args.get('payment_status')
 
-    if exp_year:
-        cards = Card.find_by_exp_year(exp_year)
-    elif number:
-        cards = Card.find_by_number(number)
-    elif name:
-        cards = Card.find_by_name(name)         # Name on Card should be added
+    if customer_id:
+        payments = Payment.find_by_customer_id(customer_id)
+    elif order_id:
+        payments = Payment.find_by_order_id(order_id)
+    elif payment_method_type:
+        payments = Payment.find_by_payment_method_type(payment_method_type)
+    elif payment_status:
+        payments = Payment.find_by_payment_status(payment_status)
     else:
-        cards = Card.all()
+        payments = Payment.all()
 
-    results = [card.serialize() for card in cards]
+    results = [payment.serialize() for payment in payments]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 
 
 ######################################################################
-# RETRIEVE A SINGLE CARD
-######################################################################
-@app.route('/cards/<int:number>', methods=['GET'])
-def get_cards(number):
+# RETRIEVES A SINGLE PAYMENT  ---
+#####################################################################
+@app.route('/payments/<int:id>', methods=['GET'])
+def get_payments(id):
     """
-    Retrieves a single Card for a customerhn
-    This endpoint will return a Card based on it's number
+    Retrieves a single Payment for the customer
+    This endpoint will return a Payment based on it's id
     """
 
-    card = Card.find(number)
-    if not card:
-        raise NotFound("Card Number '{}' was not found.".format(number))
-    return make_response(jsonify(card.serialize()), status.HTTP_200_OK)
+    payment = Payment.find(id)
+    if not payment:
+        raise NotFound("Payment '{}' was not found.".format(id))
+    return make_response(jsonify(payment.serialize()), status.HTTP_200_OK)
 
 
 ######################################################################
-# ADD A NEW CARD
+# ADDS A NEW PAYMENT
 ######################################################################
-@app.route('/cards', methods=['POST'])
-def create_cards():
+@app.route('/payments', methods=['POST'])
+def create_payments():
     """
-    Creates a Card
-    This endpoint will create a Payment source based on the Card Info in the body that is posted
+    Creates a Payment Method
+    This endpoint will create a Payment source based on the Payment Info in the body that is posted
     """
     check_content_type('application/json')
-    card = Card()
-    card.deserialize(request.get_json())
-    card.save()
-    message = card.serialize()
-    location_url = url_for('get_cards', number=card.number, _external=True)
+    payment = Payment()
+    payment.deserialize(request.get_json())
+    payment.save()
+    message = payment.serialize()
+    location_url = url_for('get_payments', id=payment.id, _external=True)
     return make_response(jsonify(message), status.HTTP_201_CREATED,
                          {
                              'Location': location_url
                          })
 
 ######################################################################
-# UPDATE AN EXISTING CARD
+# UPDATE AN EXISTING PAYMENT   --- TODO #1 (Varsha)
 ######################################################################
-@app.route('/cards/<int:card_id>', methods=['PUT'])
-def update_cards(card_id):
-    """
-    Update a Card
-    This endpoint will update a Card based the body that is posted
-    """
-    check_content_type('application/json')
-    card = Card.find(card_id)
-    if not card:
-        raise NotFound("Card with id '{}' was not found.".format(card_id))
-    card.deserialize(request.get_json())
-    card.id = card_id
-    card.save()
-    return make_response(jsonify(card.serialize()), status.HTTP_200_OK)
+# @app.route('/cards/<int:card_id>', methods=['PUT'])
+# def update_cards(card_id):
+#     """
+#     Update a Card
+#     This endpoint will update a Card based the body that is posted
+#     """
+#     check_content_type('application/json')
+#     card = Card.find(card_id)
+#     if not card:
+#         raise NotFound("Card with id '{}' was not found.".format(card_id))
+#     card.deserialize(request.get_json())
+#     card.id = card_id
+#     card.save()
+#     return make_response(jsonify(card.serialize()), status.HTTP_200_OK)
 
 
 ######################################################################
-# DELETE A CARD
+# DELETE A PAYMENT   --- TODO #2 (Shu)
 ######################################################################
-@app.route('/cards/<int:card_id>', methods=['DELETE'])
-def delete_cards(card_id):
-    """
-    Delete a Card
-    This endpoint will delete a Card based the id specified in the path
-    """
-    card = Card.find(card_id)
-    if card:
-        card.delete()
-    return make_response('', status.HTTP_204_NO_CONTENT)
+# @app.route('/cards/<int:card_id>', methods=['DELETE'])
+# def delete_cards(card_id):
+#     """
+#     Delete a Card
+#     This endpoint will delete a Card based the id specified in the path
+#     """
+#     card = Card.find(card_id)
+#     if card:
+#         card.delete()
+#     return make_response('', status.HTTP_204_NO_CONTENT)
 
 
 ######################################################################
-#   PERFORM ACTION - CHARGE A CARD
+#   PERFORM ACTION - SET DEFAULT PAYMENT  --- TODO #3 (Gideon)
 ######################################################################
-@app.route('/cards/<int:card_id>/<float:amount>', methods=['PUT'])
-def charge_card(card_id, amount):
-    """
-    Charge a Card
-    This endpoint will charge a purchase against a card
-    """
-    card = Card.find(card_id)   # Find a card by ID
-    if not card:           # In case wrong card number was entered
-        raise NotFound("Card with id '{}' was not found.".format(card_id))
-    
-    if (amount <= card.balance):     # Transaction succeeds
-        card.balance = card.balance - amount
-        card.save()
-        return make_response('', status.HTTP_202_ACCEPTED)
-    else:                        # Transaction fails due to insufficient balance
-        return make_response('', status.HTTP_406_NOT_ACCEPTABLE)
-
+# @app.route('/cards/<int:card_id>/<float:amount>', methods=['PUT'])
+# def charge_card(card_id, amount):
+#     """
+#     Charge a Card
+#     This endpoint will charge a purchase against a card
+#     """
+#     card = Card.find(card_id)   # Find a card by ID
+#     if not card:           # In case wrong card number was entered
+#         raise NotFound("Card with id '{}' was not found.".format(card_id))
+#
+#     if (amount <= card.balance):     # Transaction succeeds
+#         card.balance = card.balance - amount
+#         card.save()
+#         return make_response('', status.HTTP_202_ACCEPTED)
+#     else:                        # Transaction fails due to insufficient balance
+#         return make_response('', status.HTTP_406_NOT_ACCEPTABLE)
 
 
 
@@ -205,7 +209,8 @@ def charge_card(card_id, amount):
 def init_db():
     """ Initialies the SQLAlchemy app """
     global app
-    Card.init_db(app)
+    Payment.init_db(app)
+
 
 def check_content_type(content_type):
     """ Checks that the media type is correct """
@@ -213,6 +218,7 @@ def check_content_type(content_type):
         return
     app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(415, 'Content-Type must be {}'.format(content_type))
+
 
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """

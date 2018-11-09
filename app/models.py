@@ -6,19 +6,16 @@ All of the models are stored in this module
 
 Models
 ------
-Card - A Card used in the Service
+Payment - A Payment Method used in the Service for making a payment
 
 
 Attributes:
 -----------
-number (string) - the card number, represented as a string without any separators
-exp_month (integer) - the card expiration month, represented as an integer
-exp_year (integer) - the card expiration year, represented as an integer
-cvc (string) - the card security code, represented as an string (so that if the leading digit is 0, it is still stored correctly)
-address_zip (string) - the card billing zip code, represented as a string (so that if the leading digit is 0, it is still stored correctly)
-balance (float) - the card balance, represented as a float
+
+
 """
 import logging
+from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
 
 # Create the SQLAlchemy object to be initialized later in init_db()
@@ -28,9 +25,23 @@ class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
     pass
 
-class Card(db.Model):
+
+class PaymentStatus(Enum):
+   UNPAID = 1
+   PROCESSING = 2
+   PAID = 3
+
+
+
+class PaymentMethodType(Enum):
+   __order__ ='CREDIT DEBIT PAYPAL'
+   CREDIT = 1
+   DEBIT = 2
+   PAYPAL = 3
+
+class Payment(db.Model):
     """
-    Class that represents a Card
+    Class that represents a Payment
 
     This version uses a relational database for persistence which is hidden
     from us by SQLAlchemy's object relational mappings (ORM)
@@ -40,118 +51,139 @@ class Card(db.Model):
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
-    number = db.Column(db.String(19))
-    exp_month = db.Column(db.Integer)
-    exp_year = db.Column(db.Integer)
-    cvc = db.Column(db.String(4))
-    address_zip = db.Column(db.String(5))
-    name = db.Column(db.String(50))
-    balance = db.Column(db.Float)
+    customer_id = db.Column(db.Integer, nullable=False)
+    order_id = db.Column(db.Integer, nullable=False)
+    payment_status = db.Column(db.Enum(PaymentStatus))
+    payment_method_type = db.Column(db.Enum(PaymentMethodType), nullable=False)
+    default_payment_type = db.Column(db.Boolean, default=False)
 
 
     def __repr__(self):
-        return '<Card %r>' % (self.name)
+        return '<Payment %r>' % (self.name)
 
     def save(self):
         """
-        Saves a Card to the data store
+        Saves a Payment to the data store
         """
         if not self.id:
             db.session.add(self)
         db.session.commit()
 
     def delete(self):
-        """ Removes a Card from the data store """
+        """ Removes a Payment from the data store """
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
-        """ Serializes a Card into a dictionary """
+        """ Serializes a Payment into a dictionary """
         return {"id": self.id,
-                "number": self.number,
-                "exp_month": self.exp_month,
-                "exp_year": self.exp_year,
-		"cvc": self.cvc,
-		"address_zip": self.address_zip,
-		"name": self.name,
-	        "balance": self.balance }
+                "customer_id": self.customer_id,
+                "order_id": self.order_id,
+                "payment_status": self.payment_status,
+		        "payment_method_type": self.payment_method_type,
+		        "default_payment_type": self.default_payment_type,
+	           }
 
 
     def deserialize(self, data):
         """
-        Deserializes a Card from a dictionary
+        Deserializes a Payment from dictionary
 
         Args:
-            data (dict): A dictionary containing the Card data
+            data (dict): A dictionary containing the Payment Data
         """
         try:
-
-            self.number = data['number']
-            self.exp_month = data['exp_month']
-            self.exp_year = data['exp_year']
-	    self.cvc = data['cvc']
-	    self.address_zip = data['address_zip']
-	    self.name = data['name']
-	    self.balance = data['balance']
+            self.customer_id = data['customer_id']
+            self.order_id = data['order_id']
+            self.payment_status = data['payment_status']
+	    self.payment_method_type = data['payment_method_type']
+	    self.default_payment_type = data['default_payment_type']
 
         except KeyError as error:
-            raise DataValidationError('Invalid card: missing ' + error.args[0])
+            raise DataValidationError('Invalid Payment Data: missing ' + error.args[0])
         except TypeError as error:
-            raise DataValidationError('Invalid card: body of request contained' \
+            raise DataValidationError('Invalid Payment Data: body of request contained' \
                                       'bad or no data')
         return self
+
 
     @staticmethod
     def init_db(app):
         """ Initializes the database session """
-        Card.logger.info('Initializing database')
-        Card.app = app
+        Payment.logger.info('Initializing database')
+        Payment.app = app
         # This is where we initialize SQLAlchemy from the Flask app
         db.init_app(app)
         app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
 
+
     @staticmethod
     def all():
-        """ Returns all of the Cards in the database """
-        Card.logger.info('Processing all Cards')
-        return Card.query.all()
+        """ Returns all of the Payments in the database """
+        Payment.logger.info('Processing all Payments')
+        return Payment.query.all()
+
 
     @staticmethod
-    def find(card_id):
-        """ Finds a Card by its ID """
-        Card.logger.info('Processing lookup for id %s ...', card_id)
-        return Card.query.get(card_id)
+    def find(id):
+        """ Finds a Payment by its ID """
+        Payment.logger.info('Processing lookup for payment_id %s ...', id)
+        return Payment.query.get(id)
+
 
     @staticmethod
-    def find_or_404(card_id):
-        """ Find a Card by its id """
-        Card.logger.info('Processing lookup or 404 for id %s ...', card_id)
-        return Card.query.get_or_404(card_id)
+    def find_or_404(payment_id):
+        """ Find a Payment by its id """
+        Payment.logger.info('Processing lookup or 404 for payment_id %s ...', payment_id)
+        return Payment.query.get_or_404(payment_id)
+
 
     @staticmethod
-    def find_by_name(name):
-        """ Returns all Cards with the given name
+    def find_by_customer_id(customer_id):
+        """ Returns all Payments for the given customer_id
         Args:
-            name (string): the name of the Cards you want to match
+            customer_id (int): the customer_id of the Customer you want to match
         """
-        Card.logger.info('Processing name query for %s ...', name)
-        return Card.query.filter(Card.name == name)
+        Payment.logger.info('Processing payments query for %s ...', customer_id)
+        return Payment.query.filter(Payment.customer_id == customer_id)
+
 
     @staticmethod
-    def find_by_number(number):
-        """ Returns all of the Cards with the given number
+    def find_by_order_id(order_id):
+        """ Returns Payments for the given order_id
         Args:
-            number (string): the number of the Cards you want to match
+            order_id (int): the number of the order_id you want to match
         """
-        Card.logger.info('Processing number query for %s ...', number)
-        return Card.query.filter(Card.number == number)
+        Payment.logger.info('Processing order_id query for %s ...', order_id)
+        return Payment.query.filter(Payment.order_id == order_id)
+
 
     @staticmethod
-    def find_by_exp_year(exp_year):
-        """ Returns all of the Cards with the given expiration year
+    def find_by_payment_status(payment_status):
+        """ Returns all of the Payments with the given payment status
         Args:
-            exp_year (integer): the expiration year of the Cards you want to match
+            payment_status (enum): the payment_status of Payments you want to match
         """
-        Card.logger.info('Processing exp_year query for %s ...', exp_year)
-        return Card.query.filter(Card.exp_year == exp_year)
+        Payment.logger.info('Processing payment_status query for %s ...', payment_status)
+        return Payment.query.filter(Payment.payment_status == payment_status)
+
+
+    @staticmethod
+    def find_by_payment_method_type(payment_method_type):
+        """ Returns all Payments with the given payment method type
+        Args:
+            payment_method_type (int): the payment_status of Payments you want to match
+        """
+        Payment.logger.info('Processing payment_method_type query for %s ...', payment_method_type)
+        return Payment.query.filter(Payment.payment_method_type == payment_method_type)
+
+
+    @staticmethod
+    def get_default_payment_type():
+        """ Returns the default payment method type
+        Args:
+        default_payment_type(): of all Payments which is set to true
+        """
+        Payment.logger.info('Processing default_payment_type query for %s ...', default_payment_type)
+        return Payment.query.filter(Payment.default_payment_type.is_(True)).All
