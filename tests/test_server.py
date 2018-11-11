@@ -74,10 +74,7 @@ class TestPaymentServer(unittest.TestCase):
         # save the current number of payments for later comparison
         all_payments_count = self.get_all_payments_count()
         # add a new payment method
-
         new_payment = dict(customer_id=53121, order_id=15190, payment_method_type=PaymentMethodType.DEBIT, payment_status=PaymentStatus.PAID,  default_payment_type=False)
-
-        json.dumps(PaymentMethodType.DEBIT)
 
         data = json.dumps(new_payment)
         resp = self.app.post('/payments',
@@ -93,7 +90,7 @@ class TestPaymentServer(unittest.TestCase):
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['order_id'], 15190)
 
-        # check that count has gone up and includes sammy
+        # check that count has gone up and includes the new payment resource
         resp = self.app.get('/payments')
         data = json.loads(resp.data)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -171,30 +168,33 @@ class TestPaymentServer(unittest.TestCase):
 
 
     # TODO -- Test Case for Update Payment needs to be added (Idea: You can update the Payment Status from "PRCOESSING" to "PAID") (Varsha)
-    # def test_update_card(self):
-    #     """ Update an existing Card """
-    #     card = Card.find_by_number("123412341234")[0];
-    #     new_card5678 = dict(number="123412341234", exp_month = 12, exp_year = 2020, cvc = "321",  address_zip = "07111", name='xyzba', balance=50)
-    #     data = json.dumps(new_card5678)
-    #     resp = self.app.put('/cards/{}'.format(card.id),
-    #                         data=data,
-    #                         content_type='application/json')
-    #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
-    #     new_json = json.loads(resp.data)
-    #     self.assertEqual(new_json['exp_year'], 2020)
-    #     self.assertEqual(new_json['address_zip'], '07111')
+    def test_update_payment(self):
+        """ Update an existing Payment Resource """
+
+        payment = Payment.find_by_order_id('15189')[0];
+
+        test_payment = dict(customer_id=14121, order_id = 15189, payment_method_type = PaymentMethodType.PAYPAL, payment_status = PaymentStatus.PAID,  default_payment_type = False)
+        data = json.dumps(test_payment)
+
+        resp = self.app.put('/payments/{}'.format(payment.id),
+                            data=data,
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_json = json.loads(resp.data)
+        self.assertEqual(new_json['payment_status'], 'PAID')
+        self.assertEqual(new_json['payment_method_type'], 'PAYPAL')
 
 
     # TODO -- Test Case for Update Payment Not found
-    # def test_update_card_not_found(self):
-    #     """ Update an existing Card """
-    #     card = Card.find_by_number("123412341234")[0];
-    #     new_card5678 = dict(number="123412341234", exp_month = 12, exp_year = 2020, cvc = "321",  address_zip = "07111", name='xyzba', balance=50)
-    #     data = json.dumps(new_card5678)
-    #     resp = self.app.put('/cards/{}'.format(0),
-    #                         data=data,
-    #                         content_type='application/json')
-    #     self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    def test_update_payment_not_found(self):
+        """ Update an existing Payment Resource not in DB"""
+        payment = Payment.find_by_order_id('15189')[0];
+        test_payment = dict(customer_id=14121, order_id = 15189, payment_method_type = PaymentMethodType.PAYPAL, payment_status = PaymentStatus.PROCESSING,  default_payment_type = False)
+        data = json.dumps(test_payment)
+        resp = self.app.put('/payments/0',
+                            data=data,
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
 
     # TODO -- Test Case for Delete Payment  (Shu)
