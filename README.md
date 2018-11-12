@@ -56,25 +56,23 @@ This endpoint will create a Payment source based on the Payment Info in the body
     }
 
 
-### Update an Existing Payment  (#Todo Varsha)
+### Update an Existing Payment
 This endpoint will update a Card based the body that is posted.
 
-    PUT /cards/{number}
+    PUT /payments/{number}
 
 #### Route Parameters
 
-**number** (INTEGER) The card ID
+**number** (INTEGER) The payment resource ID
 
 #### HTTP Request Body Example
 
     {
-        "number": "4242424242424242",
-        "exp_month": 5,
-        "exp_year": 2020,
-        "cvc": "123",
-        "address_zip": "12345",
-        "name": "Dennis John",
-        "balance": 105.00
+      "customer_id": 12310,
+      "order_id": 13151,
+      "payment_method_type": "CREDIT",
+      "payment_status": "PAID"
+      "default_payment_type": False,
     }
 
 ### Delete a Payment  (#Todo Shu)
