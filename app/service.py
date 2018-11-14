@@ -181,25 +181,37 @@ def update_payments(id):
 
 
 ######################################################################
-#   PERFORM ACTION - SET DEFAULT PAYMENT  --- TODO #3 (Gideon)
+#   PERFORM ACTIONS - SET DEFAULT PAYMENT AND DISABLE DEFAULT PAYMENT
 ######################################################################
-# @app.route('/cards/<int:card_id>/<float:amount>', methods=['PUT'])
-# def charge_card(card_id, amount):
-#     """
-#     Charge a Card
-#     This endpoint will charge a purchase against a card
-#     """
-#     card = Card.find(card_id)   # Find a card by ID
-#     if not card:           # In case wrong card number was entered
-#         raise NotFound("Card with id '{}' was not found.".format(card_id))
-#
-#     if (amount <= card.balance):     # Transaction succeeds
-#         card.balance = card.balance - amount
-#         card.save()
-#         return make_response('', status.HTTP_202_ACCEPTED)
-#     else:                        # Transaction fails due to insufficient balance
-#         return make_response('', status.HTTP_406_NOT_ACCEPTABLE)
+ @app.route('/payments/<int:id>/default', methods=['PUT'])
+ def set_default(id):
+     """
+     Set default payment source
+     This endpoint will set a payment source as the default
+     """
+	 payment = Payment.find(id)
+     if not payment:
+         raise NotFound("Payment with id '{}' was not found.".format(card_id))
+		 		
+	 payment.set_default()
+	 payment.save()
+	 message = payment.serialize()
+     return make_response(jsonify(message), status.HTTP_200_OK)
 
+	 
+ @app.route('/payments/<int:id>/unset', methods=['PUT'])
+ def unset_default(id):
+     """
+     Disable the default payment source. This would be necessary when switching the default from one payment to another.
+     """
+	 payment = Payment.find(id)
+     if not payment:
+         raise NotFound("Payment with id '{}' was not found.".format(card_id))
+	
+	 payment.unset_default()
+	 payment.save()
+	 message = payment.serialize()
+     return make_response(jsonify(message), status.HTTP_200_OK)
 
 
 ######################################################################
