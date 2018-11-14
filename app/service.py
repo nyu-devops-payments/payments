@@ -183,8 +183,9 @@ def update_payments(id):
 ######################################################################
 #   PERFORM ACTIONS - SET DEFAULT PAYMENT AND DISABLE DEFAULT PAYMENT
 ######################################################################
- @app.route('/payments/<int:id>/default', methods=['PUT'])
- def set_default(id):
+
+@app.route('/payments/<int:id>/default', methods=['PUT'])
+def set_default(id):
     """
     Set default payment source
     This endpoint will set a payment source as the default
@@ -199,8 +200,8 @@ def update_payments(id):
     return make_response(jsonify(message), status.HTTP_200_OK)
 
 	 
- @app.route('/payments/<int:id>/unset', methods=['PUT'])
- def unset_default(id):
+@app.route('/payments/<int:id>/unset', methods=['PUT'])
+def unset_default(id):
     """
     Disable the default payment source. This would be necessary when switching the default from one payment to another.
     """
