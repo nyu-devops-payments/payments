@@ -203,7 +203,7 @@ class TestPaymentServer(unittest.TestCase):
         temp4 = Payment.find(payment2.id)
         self.assertEqual(temp4.default_payment_type, True)
 
-        def test_set_default_not_found(self):
+    def test_set_default_not_found(self):
         """ Sets a default payment with an invalid ID """
         resp = self.app.put('/payments/0/default')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
