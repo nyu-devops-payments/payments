@@ -172,29 +172,36 @@ class TestPaymentServer(unittest.TestCase):
         payment = Payment.find_by_order_id(11150)[0]
         self.assertEqual(payment.default_payment_type, False)
 
+        # Get second payment for the customer and confirm default is false
+        payment2 = Payment.find_by_order_id(12143)[0]
+        self.assertEqual(payment2.default_payment_type, False)
+				
+        # Sanity check - make sure we're testing two records of the same customer
+        self.assertEqual(payment.customer_id, payment2.customer_id)
+		
         # Set default
         resp = self.app.put('/payments/{}/default'.format(payment.id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+		
+        # Confirm first is true
+        temp1 = Payment.find_by_order_id(payment.order_id)[0]
+        self.assertEqual(temp1.default_payment_type, True)
 
-        # Confirm default is now true
-        payment1 = Payment.find_by_order_id(payment.order_id)[0]
-        self.assertEqual(payment1.default_payment_type, True)
+        # Confirm second is still false
+        temp2 = Payment.find_by_order_id(payment2.order_id)[0]
+        self.assertEqual(temp2.default_payment_type, False)
 
-        # Now set the customer's other payment to default
-        payment2 = Payment.find_by_order_id(12143)[0]
-        resp2 = self.app.put('/payments/{}/default'.format(payment2.id))
-        self.assertEqual(resp2.status_code, status.HTTP_200_OK)
+        # Now swap - set the second to default
+        resp = self.app.put('/payments/{}/default'.format(payment2.id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-		# Sanity check - make sure the two customer ids are the same
-		self.assertEqual(payment.customer_id, payment2.customer_id)
+		   # Confirm first is false
+        temp3 = Payment.find_by_order_id(payment.order_id)[0]
+        self.assertEqual(temp3.default_payment_type, False)
 
-        # Confirm new one is true
-        payment3 = Payment.find_by_order_id(payment2.order_id)[0]
-        self.assertEqual(payment3.default_payment_type, True)
-
-        # Confirm old one is false
-        payment4 = Payment.find_by_order_id(payment.order_id)[0]
-        self.assertEqual(payment4.default_payment_type, False)
+        # Confirm second is true
+        temp4 = Payment.find_by_order_id(payment.order_id)[0]
+        self.assertEqual(temp4.default_payment_type, True)
 
 
     # TODO -- Test Case for Update Payment needs to be added (Idea: You can update the Payment Status from "PRCOESSING" to "PAID") (Varsha)
