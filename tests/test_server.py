@@ -185,6 +185,9 @@ class TestPaymentServer(unittest.TestCase):
         resp2 = self.app.put('/payments/{}/default'.format(payment2.id))
         self.assertEqual(resp2.status_code, status.HTTP_200_OK)
 
+		# Sanity check - make sure the two customer ids are the same
+		self.assertEqual(payment.customer_id, payment2.customer_id)
+
         # Confirm new one is true
         payment3 = Payment.find_by_order_id(payment2.order_id)[0]
         self.assertEqual(payment3.default_payment_type, True)
