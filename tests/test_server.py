@@ -170,14 +170,14 @@ class TestPaymentServer(unittest.TestCase):
         """ Set the default payment for a customer """
         # Get a payment and confirm default is false
         payment = Payment.find_by_order_id('11150')[0]
-        self.assertEqual(payment['default_payment_type'], False)
+        self.assertEqual(payment.default_payment_type, False)
 
         # Set default
         resp = self.app.put('/payments/{}/default'.format(payment.id))
 
         # Confirm default is now true
         payment1 = Payment.find_by_order_id('11150')[0]
-        self.assertEqual(payment1['default_payment_type'], True)
+        self.assertEqual(payment1.default_payment_type, True)
 
         # Now set the customer's other payment to default
         payment2 = Payment.find_by_order_id('12143')[0]
@@ -185,11 +185,11 @@ class TestPaymentServer(unittest.TestCase):
 
         # Confirm new one is true
         payment3 = Payment.find_by_order_id('12143')[0]
-        self.assertEqual(payment3['default_payment_type'], True)
+        self.assertEqual(payment3.default_payment_type, True)
 
         # Confirm old one is false
         payment4 = Payment.find_by_order_id('11150')[0]
-        self.assertEqual(payment4['default_payment_type'], False)
+        self.assertEqual(payment4.default_payment_type, False)
 
 
     # TODO -- Test Case for Update Payment needs to be added (Idea: You can update the Payment Status from "PRCOESSING" to "PAID") (Varsha)
