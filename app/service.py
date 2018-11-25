@@ -181,7 +181,7 @@ def update_payments(id):
 
 
 ######################################################################
-#   PERFORM ACTIONS - SET DEFAULT PAYMENT AND DISABLE DEFAULT PAYMENT
+#   PERFORM ACTIONS - SET DEFAULT PAYMENT
 ######################################################################
 
 @app.route('/payments/<int:id>/default', methods=['PUT'])
@@ -193,23 +193,13 @@ def set_default(id):
     payment = Payment.find(id)
     if not payment:
         raise NotFound("Payment with id '{}' was not found.".format(card_id))
-		 		
-    payment.set_default()
-    payment.save()
-    message = payment.serialize()
-    return make_response(jsonify(message), status.HTTP_200_OK)
 
-	 
-@app.route('/payments/<int:id>/unset', methods=['PUT'])
-def unset_default(id):
-    """
-    Disable the default payment source. This would be necessary when switching the default from one payment to another.
-    """
-    payment = Payment.find(id)
-    if not payment:
-        raise NotFound("Payment with id '{}' was not found.".format(card_id))
-	
-    payment.unset_default()
+	others = find_by_customer_id(payment.customer_id)
+	for o in others:
+		o.unset_default()
+		o.save()
+
+    payment.set_default()
     payment.save()
     message = payment.serialize()
     return make_response(jsonify(message), status.HTTP_200_OK)
