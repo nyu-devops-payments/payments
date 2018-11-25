@@ -169,7 +169,7 @@ class TestPaymentServer(unittest.TestCase):
     def test_set_default(self):
         """ Set the default payment for a customer """
         # Get a payment and confirm default is false
-        payment = Payment.find_by_order_id('11150')[0]
+        payment = Payment.find_by_order_id(11150)[0]
         self.assertEqual(payment.default_payment_type, False)
 
         # Set default
@@ -177,20 +177,20 @@ class TestPaymentServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         # Confirm default is now true
-        payment1 = Payment.find_by_order_id('11150')[0]
+        payment1 = Payment.find_by_order_id(payment.order_id)[0]
         self.assertEqual(payment1.default_payment_type, True)
 
         # Now set the customer's other payment to default
-        payment2 = Payment.find_by_order_id('12143')[0]
+        payment2 = Payment.find_by_order_id(12143)[0]
         resp2 = self.app.put('/payments/{}/default'.format(payment2.id))
         self.assertEqual(resp2.status_code, status.HTTP_200_OK)
 
         # Confirm new one is true
-        payment3 = Payment.find_by_order_id('12143')[0]
+        payment3 = Payment.find_by_order_id(payment2.order_id)[0]
         self.assertEqual(payment3.default_payment_type, True)
 
         # Confirm old one is false
-        payment4 = Payment.find_by_order_id('11150')[0]
+        payment4 = Payment.find_by_order_id(payment.order_id)[0]
         self.assertEqual(payment4.default_payment_type, False)
 
 
