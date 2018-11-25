@@ -191,18 +191,6 @@ class TestPaymentServer(unittest.TestCase):
         temp2 = Payment.find_by_order_id(payment2.order_id)[0]
         self.assertEqual(temp2.default_payment_type, False)
 
-        # Now swap - set the second to default
-        resp2 = self.app.put('/payments/{}/default'.format(payment2.id))
-        self.assertEqual(resp2.status_code, status.HTTP_200_OK)
-
-        # Confirm first is false
-        temp3 = Payment.find(payment.id)
-        self.assertEqual(temp3.default_payment_type, False)
-
-        # Confirm second is true
-        temp4 = Payment.find(payment2.id)
-        self.assertEqual(temp4.default_payment_type, True)
-
 
     # TODO -- Test Case for Update Payment needs to be added (Idea: You can update the Payment Status from "PRCOESSING" to "PAID") (Varsha)
     def test_update_payment(self):
