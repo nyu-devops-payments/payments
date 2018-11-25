@@ -192,15 +192,15 @@ class TestPaymentServer(unittest.TestCase):
         self.assertEqual(temp2.default_payment_type, False)
 
         # Now swap - set the second to default
-        resp = self.app.put('/payments/{}/default'.format(payment2.id))
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        resp2 = self.app.put('/payments/{}/default'.format(payment2.id))
+        self.assertEqual(resp2.status_code, status.HTTP_200_OK)
 
         # Confirm first is false
-        temp3 = Payment.find_by_order_id(payment.order_id)[0]
+        temp3 = Payment.find(payment.id)[0]
         self.assertEqual(temp3.default_payment_type, False)
 
         # Confirm second is true
-        temp4 = Payment.find_by_order_id(payment2.order_id)[0]
+        temp4 = Payment.find(payment2.id)[0]
         self.assertEqual(temp4.default_payment_type, True)
 
 
