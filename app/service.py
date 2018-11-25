@@ -8,6 +8,7 @@ GET /payments/{id} - Returns the Payment with a given id number
 POST /payments - creates a new Payment record in database
 PUT /payments/{order_id} - updates a Payment record in database
 DELETE /payments/{id} - deletes a Payment record in database
+PUT /payments{id}/default - sets a Payment as default for the customer
 """
 
 
@@ -192,12 +193,12 @@ def set_default(id):
     """
     payment = Payment.find(id)
     if not payment:
-        raise NotFound("Payment with id '{}' was not found.".format(card_id))
+        raise NotFound("Payment with id '{}' was not found.".format(id))
 
-	others = find_by_customer_id(payment.customer_id)
-	for o in others:
-		o.unset_default()
-		o.save()
+	allpayments = find_by_customer_id(payment.customer_id)
+	for p in allpayments:
+		p.unset_default()
+		p.save()
 
     payment.set_default()
     payment.save()

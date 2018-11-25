@@ -174,6 +174,7 @@ class TestPaymentServer(unittest.TestCase):
 
         # Set default
         resp = self.app.put('/payments/{}/default'.format(payment.id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         # Confirm default is now true
         payment1 = Payment.find_by_order_id('11150')[0]
@@ -182,6 +183,7 @@ class TestPaymentServer(unittest.TestCase):
         # Now set the customer's other payment to default
         payment2 = Payment.find_by_order_id('12143')[0]
         resp2 = self.app.put('/payments/{}/default'.format(payment2.id))
+        self.assertEqual(resp2.status_code, status.HTTP_200_OK)
 
         # Confirm new one is true
         payment3 = Payment.find_by_order_id('12143')[0]
