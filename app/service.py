@@ -195,10 +195,10 @@ def set_default(id):
     if not payment:
         raise NotFound("Payment with id '{}' was not found.".format(id))
 
-	allpayments = find_by_customer_id(payment.customer_id)
-	for p in allpayments:
-		p.unset_default()
-		p.save()
+    allpayments = find_by_customer_id(payment.customer_id)
+    for p in allpayments:
+        p.unset_default()
+        p.save()
 
     payment.set_default()
     payment.save()
