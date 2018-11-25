@@ -110,7 +110,7 @@ class TestPayments(unittest.TestCase):
         payment2 = Payment.find(payment.id)
         self.assertEqual(payment2.default_payment_type, True)
         # Change it and save it
-        payment2.set_default()
+        payment2.unset_default()
         payment2.save()
         # Retrieve from DB and confirm it saved correctly
         payment3 = Payment.find(payment.id)
