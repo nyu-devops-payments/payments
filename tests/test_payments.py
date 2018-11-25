@@ -86,6 +86,36 @@ class TestPayments(unittest.TestCase):
         self.assertEqual(len(payments), 1)
         self.assertEqual(payments[0].payment_method_type, PaymentMethodType.DEBIT)
 
+    def test_set_payment_default(self):
+        """ Set a payment as default """
+        payment = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = False)
+        payment.save()
+        self.assertEqual(payment.default_payment_type, False)
+        # Retrieve from DB and confirm it saved correctly
+        payment2 = Payment.find(payment.id)
+        self.assertEqual(payment2.default_payment_type, False)
+        # Change it and save it
+        payment2.set_default()
+        payment2.save()
+        # Retrieve from DB and confirm it saved correctly
+        payment3 = Payment.find(payment.id)
+        self.assertEqual(payment3.default_payment_type, True)
+
+    def test_set_payment_not_default(self):
+        """ Set a payment as not default """
+        payment = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
+        payment.save()
+        self.assertEqual(payment.default_payment_type, True)
+        # Retrieve from DB and confirm it saved correctly
+        payment2 = Payment.find(payment.id)
+        self.assertEqual(payment2.default_payment_type, True)
+        # Change it and save it
+        payment2.unset_default()
+        payment2.save()
+        # Retrieve from DB and confirm it saved correctly
+        payment3 = Payment.find(payment.id)
+        self.assertEqual(payment3.default_payment_type, False)
+
 
     # TODO -- Test Delete Payment  (Shu)
     # def test_delete_a_card(self):

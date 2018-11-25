@@ -8,6 +8,7 @@ GET /payments/{id} - Returns the Payment with a given id number
 POST /payments - creates a new Payment record in database
 PUT /payments/{order_id} - updates a Payment record in database
 DELETE /payments/{id} - deletes a Payment record in database
+PUT /payments{id}/default - sets a Payment as default for the customer
 """
 
 
@@ -181,25 +182,28 @@ def update_payments(id):
 
 
 ######################################################################
-#   PERFORM ACTION - SET DEFAULT PAYMENT  --- TODO #3 (Gideon)
+#   PERFORM ACTIONS - SET DEFAULT PAYMENT
 ######################################################################
-# @app.route('/cards/<int:card_id>/<float:amount>', methods=['PUT'])
-# def charge_card(card_id, amount):
-#     """
-#     Charge a Card
-#     This endpoint will charge a purchase against a card
-#     """
-#     card = Card.find(card_id)   # Find a card by ID
-#     if not card:           # In case wrong card number was entered
-#         raise NotFound("Card with id '{}' was not found.".format(card_id))
-#
-#     if (amount <= card.balance):     # Transaction succeeds
-#         card.balance = card.balance - amount
-#         card.save()
-#         return make_response('', status.HTTP_202_ACCEPTED)
-#     else:                        # Transaction fails due to insufficient balance
-#         return make_response('', status.HTTP_406_NOT_ACCEPTABLE)
 
+@app.route('/payments/<int:id>/default', methods=['PUT'])
+def set_default(id):
+    """
+    Set default payment source
+    This endpoint will set a payment source as the default
+    """
+    payment = Payment.find(id)
+    if not payment:
+        raise NotFound("Payment with id '{}' was not found.".format(id))
+
+    allpayments = Payment.find_by_customer_id(payment.customer_id)
+    for p in allpayments:
+        p.unset_default()
+        p.save()
+
+    payment.set_default()
+    payment.save()
+    message = payment.serialize()
+    return make_response(jsonify(message), status.HTTP_200_OK)
 
 
 ######################################################################
