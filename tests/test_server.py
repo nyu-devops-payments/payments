@@ -195,12 +195,12 @@ class TestPaymentServer(unittest.TestCase):
         resp = self.app.put('/payments/{}/default'.format(payment2.id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-		   # Confirm first is false
+        # Confirm first is false
         temp3 = Payment.find_by_order_id(payment.order_id)[0]
         self.assertEqual(temp3.default_payment_type, False)
 
         # Confirm second is true
-        temp4 = Payment.find_by_order_id(payment.order_id)[0]
+        temp4 = Payment.find_by_order_id(payment2.order_id)[0]
         self.assertEqual(temp4.default_payment_type, True)
 
 
