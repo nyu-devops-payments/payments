@@ -166,6 +166,7 @@ class TestPaymentServer(unittest.TestCase):
         resp = self.app.get('/payments/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+
     def test_set_default(self):
         """ Set the default payment for a customer """
         # Get a payment and confirm default is false
@@ -286,6 +287,28 @@ class TestPaymentServer(unittest.TestCase):
     def test_method_not_allowed(self):
         resp = self.app.put('/payments')
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+    def test_check_content_type(self):
+        new_payment = dict(customer_id=53121, order_id=15190, payment_method_type=PaymentMethodType.DEBIT, payment_status=PaymentStatus.PAID,  default_payment_type=False)
+
+        data = json.dumps(new_payment)
+        resp = self.app.post('/payments',
+                             data=data,
+                             content_type='application/json1')
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+        # Make sure it is an invalid content Type
+        contentTyp = resp.headers.get('Content-Type', None)
+        print(contentTyp)
+        self.assertTrue(contentTyp != None)
+
+
+    def test_internal_server_error(self):
+        """ Test an Internal Server error """
+        resp = self.app.get('/test-error')
+        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 ######################################################################

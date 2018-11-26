@@ -83,6 +83,7 @@ def index():
                    paths=url_for('list_payments', _external=True)
                   ), status.HTTP_200_OK
 
+
 ######################################################################
 # LIST ALL PAYMENTS
 ######################################################################
@@ -205,6 +206,12 @@ def set_default(id):
     message = payment.serialize()
     return make_response(jsonify(message), status.HTTP_200_OK)
 
+######################################################################
+#   INTERNAL SERVER ERROR
+######################################################################
+@app.route('/test-error')
+def index1():
+    raise InternalServerError("Can't Initiate Request")
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

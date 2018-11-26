@@ -82,6 +82,7 @@ class TestPayments(unittest.TestCase):
         self.assertEqual(payment.payment_status, PaymentStatus.PAID)
         self.assertEqual(payment.default_payment_type, True)
 
+
     def test_update_payment(self):
         """ Update a Payment Resource """
         payment = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
