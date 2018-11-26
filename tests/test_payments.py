@@ -55,7 +55,6 @@ class TestPayments(unittest.TestCase):
         payments = Payment.all()
         self.assertEqual(len(payments), 1)
 
-
     def test_find_payment(self):
         """ Find a Payment by it's ID """
         payment11 = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
@@ -70,7 +69,20 @@ class TestPayments(unittest.TestCase):
         self.assertEqual(payment.default_payment_type, True)
 
 
-    # TODO -- Test Update Payment
+    def test_find_payment_or_404(self):
+        """ Find a Payment by it's ID """
+        payment11 = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
+        payment11.save()
+        payment = Payment.find_or_404(payment11.id)
+        self.assertIsNot(payment, None)
+        self.assertEqual(payment.id, payment11.id)
+        self.assertEqual(payment.customer_id, 12310)
+        self.assertEqual(payment.order_id, 13151)
+        self.assertEqual(payment.payment_method_type, PaymentMethodType.CREDIT)
+        self.assertEqual(payment.payment_status, PaymentStatus.PAID)
+        self.assertEqual(payment.default_payment_type, True)
+
+
     def test_update_payment(self):
         """ Update a Payment Resource """
         payment = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
@@ -87,18 +99,48 @@ class TestPayments(unittest.TestCase):
         self.assertEqual(payments[0].payment_method_type, PaymentMethodType.DEBIT)
 
 
-    # TODO -- Test Delete Payment  (Shu)
-    # def test_delete_a_card(self):
-    #     """ Delete a Card """
-    #     card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name='Fatima Mushtaq', balance=1000)
-    #    	card.save()
-    #     self.assertEqual(len(Card.all()), 1)
-    #     # delete the card and make sure it isn't in the database
-    #     card.delete()
-    #     self.assertEqual(len(Card.all()), 0)
+    def test_set_payment_default(self):
+        """ Set a payment as default """
+        payment = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = False)
+        payment.save()
+        self.assertEqual(payment.default_payment_type, False)
+        # Retrieve from DB and confirm it saved correctly
+        payment2 = Payment.find(payment.id)
+        self.assertEqual(payment2.default_payment_type, False)
+        # Change it and save it
+        payment2.set_default()
+        payment2.save()
+        # Retrieve from DB and confirm it saved correctly
+        payment3 = Payment.find(payment.id)
+        self.assertEqual(payment3.default_payment_type, True)
 
 
-    # -- TODO Serialize a Payment Request
+    def test_set_payment_not_default(self):
+        """ Set a payment as not default """
+        payment = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
+        payment.save()
+        self.assertEqual(payment.default_payment_type, True)
+        # Retrieve from DB and confirm it saved correctly
+        payment2 = Payment.find(payment.id)
+        self.assertEqual(payment2.default_payment_type, True)
+        # Change it and save it
+        payment2.unset_default()
+        payment2.save()
+        # Retrieve from DB and confirm it saved correctly
+        payment3 = Payment.find(payment.id)
+        self.assertEqual(payment3.default_payment_type, False)
+
+
+    def test_delete_a_payment(self):
+        """ Delete a Payment """
+        payment = Payment(customer_id=12310, order_id = 13159, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = False)
+        payment.save()
+        self.assertEqual(len(Payment.all()), 1)
+        # delete the card and make sure it isn't in the database
+        payment.delete()
+        self.assertEqual(len(Payment.all()), 0)
+
+
     def test_serialize_a_payment(self):
         """ Test serialization of a Payment Resource """
         payment = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
@@ -118,29 +160,26 @@ class TestPayments(unittest.TestCase):
         self.assertEqual(data['default_payment_type'], True)
 
 
-    # -- TODO Deserialize a Payment Request (Shu)
-    # def test_deserialize_a_card(self):
-    #     """ Test deserialization of a Card """
-    #     data = {"id":1,"number":"567856785678","exp_month":8,"exp_year":2010,"cvc":"321","address_zip":"10010","name":"sfvg","balance":"1000"}
-    #     card = Card()
-    #     card.deserialize(data)
-    #     self.assertNotEqual(card, None)
-    #     self.assertEqual(card.id, None)
-    #     self.assertEqual(card.number, "567856785678")
-    #     self.assertEqual(card.exp_month, 8)
-    #     self.assertEqual(card.exp_year, 2010)
-    #     self.assertEqual(card.cvc, "321")
-    #     self.assertEqual(card.address_zip, "10010")
-    #     self.assertEqual(card.name, "sfvg")
-    #     self.assertEqual(card.balance, "1000")
+    def test_deserialize_a_payment(self):
+        """ Test deserialization of a Payment """
+        data = {"customer_id":12311, "order_id":11158, "payment_method_type":PaymentMethodType.CREDIT, "payment_status":PaymentStatus.PAID, "default_payment_type":False}
+
+        payment = Payment()
+        payment.deserialize(data)
+        self.assertNotEqual(payment, None)
+        self.assertEqual(payment.id, None)
+        self.assertEqual(payment.customer_id, 12311)
+        self.assertEqual(payment.order_id, 11158)
+        self.assertEqual(payment.payment_method_type,  PaymentMethodType.CREDIT)
+        self.assertEqual(payment.payment_status, PaymentStatus.PAID)
+        self.assertEqual(payment.default_payment_type, False)
 
 
-    # -- TODO Deserialize a Bad Payment Data (Gideon)
-    # def test_deserialize_bad_data(self):
-    #     """ Test deserialization of bad data """
-    #     data = "this is not a dictionary"
-    #     card = Card()
-    #     self.assertRaises(DataValidationError, card.deserialize, data)
+    def test_deserialize_bad_data(self):
+        """ Test deserialization of bad data """
+        data = "this is not a dictionary"
+        payment = Payment()
+        self.assertRaises(DataValidationError, payment.deserialize, data)
 
 
 ######################################################################
