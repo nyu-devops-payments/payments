@@ -75,14 +75,14 @@ This endpoint will update a Card based the body that is posted.
       "default_payment_type": False,
     }
 
-### Delete a Payment  (#Todo Shu)
+### Delete a Payment 
 This endpoint will delete a Card based the id specified in the path.
 
-    DELETE /cards/{number}
+    DELETE /payments/{id}
 
 #### Route Parameters
 
-**number** (INTEGER) The card ID
+**number** (INTEGER) The payment ID
 
 
 ### Perform Action - Set a Payment as Default  (#Todo Gideon)
