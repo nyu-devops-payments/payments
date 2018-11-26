@@ -166,6 +166,7 @@ class TestPaymentServer(unittest.TestCase):
         resp = self.app.get('/payments/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+
     def test_set_default(self):
         """ Set the default payment for a customer """
         # Get a payment and confirm default is false
@@ -175,14 +176,14 @@ class TestPaymentServer(unittest.TestCase):
         # Get second payment for the customer and confirm default is false
         payment2 = Payment.find_by_order_id(12143)[0]
         self.assertEqual(payment2.default_payment_type, False)
-				
+
         # Sanity check - make sure we're testing two records of the same customer
         self.assertEqual(payment.customer_id, payment2.customer_id)
-		
+
         # Set default
         resp = self.app.put('/payments/{}/default'.format(payment.id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-		
+
         # Confirm first is true
         temp1 = Payment.find_by_order_id(payment.order_id)[0]
         self.assertEqual(temp1.default_payment_type, True)
@@ -210,7 +211,6 @@ class TestPaymentServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    # TODO -- Test Case for Update Payment needs to be added (Idea: You can update the Payment Status from "PRCOESSING" to "PAID") (Varsha)
     def test_update_payment(self):
         """ Update an existing Payment Resource """
 
@@ -228,7 +228,6 @@ class TestPaymentServer(unittest.TestCase):
         self.assertEqual(new_json['payment_method_type'], 'PAYPAL')
 
 
-    # TODO -- Test Case for Update Payment Not found
     def test_update_payment_not_found(self):
         """ Update an existing Payment Resource not in DB"""
         payment = Payment.find_by_order_id('15189')[0];
@@ -240,18 +239,17 @@ class TestPaymentServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
 
-    # TODO -- Test Case for Delete Payment  (Shu)
-    # def test_delete_card(self):
-    #     """ Delete a Card """
-    #     card = Card.find_by_number("123412341234")[0];
-    #     # save the current number of cards for later comparrison
-    #     payment_count = self.get_all_payments_count()
-    #     resp = self.app.delete('/cards/{}'.format(card.id),
-    #                            content_type='application/json')
-    #     self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-    #     self.assertEqual(len(resp.data), 0)
-    #     new_count = self.get_all_payments_count()
-    #     self.assertEqual(new_count, card_count - 1)
+    def test_delete_payment(self):
+        """ Delete a Payment """
+        payment = Payment.find_by_order_id(15189)[0];
+        # save the current number of cards for later comparrison
+        payments_count = self.get_all_payments_count()
+        resp = self.app.delete('/payments/{}'.format(payment.id),
+                               content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        new_count = self.get_all_payments_count()
+        self.assertEqual(new_count, payments_count - 1)
 
 
 
@@ -289,6 +287,28 @@ class TestPaymentServer(unittest.TestCase):
     def test_method_not_allowed(self):
         resp = self.app.put('/payments')
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+    def test_check_content_type(self):
+        new_payment = dict(customer_id=53121, order_id=15190, payment_method_type=PaymentMethodType.DEBIT, payment_status=PaymentStatus.PAID,  default_payment_type=False)
+
+        data = json.dumps(new_payment)
+        resp = self.app.post('/payments',
+                             data=data,
+                             content_type='application/json1')
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+        # Make sure it is an invalid content Type
+        contentTyp = resp.headers.get('Content-Type', None)
+        print(contentTyp)
+        self.assertTrue(contentTyp != None)
+
+
+    def test_internal_server_error(self):
+        """ Test an Internal Server error """
+        resp = self.app.get('/test-error')
+        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 ######################################################################

@@ -77,7 +77,7 @@ class Payment(db.Model):
     def set_default(self):
         """ Sets a Payment as the default """
         self.default_payment_type = True
-	
+
     def unset_default(self):
         """ Disables the default status for a Payment """
         self.default_payment_type = False
