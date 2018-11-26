@@ -74,6 +74,14 @@ class Payment(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def set_default(self):
+        """ Sets a Payment as the default """
+        self.default_payment_type = True
+	
+    def unset_default(self):
+        """ Disables the default status for a Payment """
+        self.default_payment_type = False
+
     def serialize(self):
         """ Serializes a Payment into a dictionary """
         return {"id": self.id,
@@ -146,7 +154,7 @@ class Payment(db.Model):
             customer_id (int): the customer_id of the Customer you want to match
         """
         Payment.logger.info('Processing payments query for %s ...', customer_id)
-        return Payment.query.filter(Payment.customer_id == customer_id)
+        return Payment.query.filter(Payment.customer_id == customer_id).all()
 
 
     @staticmethod
@@ -166,7 +174,7 @@ class Payment(db.Model):
             payment_status (enum): the payment_status of Payments you want to match
         """
         Payment.logger.info('Processing payment_status query for %s ...', payment_status)
-        return Payment.query.filter(Payment.payment_status == payment_status)
+        return Payment.query.filter(Payment.payment_status == payment_status).all()
 
 
     @staticmethod
@@ -176,7 +184,7 @@ class Payment(db.Model):
             payment_method_type (int): the payment_status of Payments you want to match
         """
         Payment.logger.info('Processing payment_method_type query for %s ...', payment_method_type)
-        return Payment.query.filter(Payment.payment_method_type == payment_method_type)
+        return Payment.query.filter(Payment.payment_method_type == payment_method_type).all()
 
 
     @staticmethod
@@ -186,4 +194,4 @@ class Payment(db.Model):
         default_payment_type(): of all Payments which is set to true
         """
         Payment.logger.info('Processing default_payment_type query for %s ...', default_payment_type)
-        return Payment.query.filter(Payment.default_payment_type.is_(True)).All
+        return Payment.query.filter(Payment.default_payment_type.is_(True)).all()

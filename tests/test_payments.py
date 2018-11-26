@@ -70,21 +70,51 @@ class TestPayments(unittest.TestCase):
         self.assertEqual(payment.default_payment_type, True)
 
 
-    # TODO -- Test Update Payment (Varsha)
-    # def test_update_a_card(self):
-    #     """ Update a Card """
-    #     card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name='Gideon Popkin', balance=1500)
-    #     card.save()
-    #     self.assertEqual(card.id, 1)
-    #     # Change it an save it
-    #     card.address_zip = "10011"
-    #     card.save()
-    #     self.assertEqual(card.id, 1)
-    #     # Fetch it back and make sure the id hasn't changed
-    #     # but the data did change
-    #     cards = Card.all()
-    #     self.assertEqual(len(cards), 1)
-    #     self.assertEqual(cards[0].address_zip, "10011")
+    # TODO -- Test Update Payment
+    def test_update_payment(self):
+        """ Update a Payment Resource """
+        payment = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
+        payment.save()
+        self.assertEqual(payment.id, 1)
+        # Change it and save it
+        payment.payment_method_type = PaymentMethodType.DEBIT
+        payment.save()
+        self.assertEqual(payment.id, 1)
+        # Fetch it back and make sure the id hasn't changed
+        # but the data did change
+        payments = Payment.all()
+        self.assertEqual(len(payments), 1)
+        self.assertEqual(payments[0].payment_method_type, PaymentMethodType.DEBIT)
+
+    def test_set_payment_default(self):
+        """ Set a payment as default """
+        payment = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = False)
+        payment.save()
+        self.assertEqual(payment.default_payment_type, False)
+        # Retrieve from DB and confirm it saved correctly
+        payment2 = Payment.find(payment.id)
+        self.assertEqual(payment2.default_payment_type, False)
+        # Change it and save it
+        payment2.set_default()
+        payment2.save()
+        # Retrieve from DB and confirm it saved correctly
+        payment3 = Payment.find(payment.id)
+        self.assertEqual(payment3.default_payment_type, True)
+
+    def test_set_payment_not_default(self):
+        """ Set a payment as not default """
+        payment = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
+        payment.save()
+        self.assertEqual(payment.default_payment_type, True)
+        # Retrieve from DB and confirm it saved correctly
+        payment2 = Payment.find(payment.id)
+        self.assertEqual(payment2.default_payment_type, True)
+        # Change it and save it
+        payment2.unset_default()
+        payment2.save()
+        # Retrieve from DB and confirm it saved correctly
+        payment3 = Payment.find(payment.id)
+        self.assertEqual(payment3.default_payment_type, False)
 
 
     # TODO -- Test Delete Payment  (Shu)
@@ -98,24 +128,24 @@ class TestPayments(unittest.TestCase):
     #     self.assertEqual(len(Card.all()), 0)
 
 
-    # -- TODO Serialize a Payment Request (Varsha)
-    # def test_serialize_a_card(self):
-    #     """ Test serialization of a Card """
-    #     card = Card(number="123412341234", exp_month = 10, exp_year = 2019, cvc = "123",  address_zip = "10010", name='Shu Tan', balance=2000)
-    #     data = card.serialize()
-    #     self.assertNotEqual(data, None)
-    #     self.assertIn('id', data)
-    #     self.assertEqual(data['id'], None)
-    #     self.assertIn('number', data)
-    #     self.assertEqual(data['number'], "123412341234")
-    #     self.assertIn('exp_month', data)
-    #     self.assertEqual(data['exp_month'], 10)
-    #     self.assertIn('exp_year', data)
-    #     self.assertEqual(data['exp_year'], 2019)
-    #     self.assertIn('cvc', data)
-    #     self.assertEqual(data['cvc'], "123")
-    #     self.assertIn('address_zip', data)
-    #     self.assertEqual(data['address_zip'], "10010")
+    # -- TODO Serialize a Payment Request
+    def test_serialize_a_payment(self):
+        """ Test serialization of a Payment Resource """
+        payment = Payment(customer_id=12310, order_id = 13151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
+        data = payment.serialize()
+        self.assertNotEqual(data, None)
+        self.assertIn('id', data)
+        self.assertEqual(data['id'], None)
+        self.assertIn('customer_id', data)
+        self.assertEqual(data['customer_id'], 12310)
+        self.assertIn('order_id', data)
+        self.assertEqual(data['order_id'], 13151)
+        self.assertIn('payment_method_type', data)
+        self.assertEqual(data['payment_method_type'], PaymentMethodType.CREDIT)
+        self.assertIn('payment_status', data)
+        self.assertEqual(data['payment_status'], PaymentStatus.PAID)
+        self.assertIn('default_payment_type', data)
+        self.assertEqual(data['default_payment_type'], True)
 
 
     # -- TODO Deserialize a Payment Request (Shu)

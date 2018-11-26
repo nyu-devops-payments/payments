@@ -8,6 +8,7 @@ GET /payments/{id} - Returns the Payment with a given id number
 POST /payments - creates a new Payment record in database
 PUT /payments/{order_id} - updates a Payment record in database
 DELETE /payments/{id} - deletes a Payment record in database
+PUT /payments{id}/default - sets a Payment as default for the customer
 """
 
 
@@ -83,7 +84,7 @@ def index():
                   ), status.HTTP_200_OK
 
 ######################################################################
-# LIST ALL PAYMNETS
+# LIST ALL PAYMENTS
 ######################################################################
 @app.route('/payments', methods=['GET'])
 def list_payments():
@@ -149,20 +150,20 @@ def create_payments():
 ######################################################################
 # UPDATE AN EXISTING PAYMENT   --- TODO #1 (Varsha)
 ######################################################################
-# @app.route('/cards/<int:card_id>', methods=['PUT'])
-# def update_cards(card_id):
-#     """
-#     Update a Card
-#     This endpoint will update a Card based the body that is posted
-#     """
-#     check_content_type('application/json')
-#     card = Card.find(card_id)
-#     if not card:
-#         raise NotFound("Card with id '{}' was not found.".format(card_id))
-#     card.deserialize(request.get_json())
-#     card.id = card_id
-#     card.save()
-#     return make_response(jsonify(card.serialize()), status.HTTP_200_OK)
+@app.route('/payments/<int:id>', methods=['PUT'])
+def update_payments(id):
+    """
+    Update a Card
+    This endpoint will update a Payment resource based on the Payment Info in the body that is posted
+    """
+    check_content_type('application/json')
+    payment = Payment.find(id)
+    if not payment:
+        raise NotFound("Payment '{}' was not found.".format(id))
+    payment.deserialize(request.get_json())
+    payment.save()
+    message = payment.serialize()
+    return make_response(jsonify(message), status.HTTP_200_OK)
 
 
 ######################################################################
@@ -181,25 +182,28 @@ def create_payments():
 
 
 ######################################################################
-#   PERFORM ACTION - SET DEFAULT PAYMENT  --- TODO #3 (Gideon)
+#   PERFORM ACTIONS - SET DEFAULT PAYMENT
 ######################################################################
-# @app.route('/cards/<int:card_id>/<float:amount>', methods=['PUT'])
-# def charge_card(card_id, amount):
-#     """
-#     Charge a Card
-#     This endpoint will charge a purchase against a card
-#     """
-#     card = Card.find(card_id)   # Find a card by ID
-#     if not card:           # In case wrong card number was entered
-#         raise NotFound("Card with id '{}' was not found.".format(card_id))
-#
-#     if (amount <= card.balance):     # Transaction succeeds
-#         card.balance = card.balance - amount
-#         card.save()
-#         return make_response('', status.HTTP_202_ACCEPTED)
-#     else:                        # Transaction fails due to insufficient balance
-#         return make_response('', status.HTTP_406_NOT_ACCEPTABLE)
 
+@app.route('/payments/<int:id>/default', methods=['PUT'])
+def set_default(id):
+    """
+    Set default payment source
+    This endpoint will set a payment source as the default
+    """
+    payment = Payment.find(id)
+    if not payment:
+        raise NotFound("Payment with id '{}' was not found.".format(id))
+
+    allpayments = Payment.find_by_customer_id(payment.customer_id)
+    for p in allpayments:
+        p.unset_default()
+        p.save()
+
+    payment.set_default()
+    payment.save()
+    message = payment.serialize()
+    return make_response(jsonify(message), status.HTTP_200_OK)
 
 
 ######################################################################
