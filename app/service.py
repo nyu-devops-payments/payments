@@ -148,12 +148,12 @@ def create_payments():
                          })
 
 ######################################################################
-# UPDATE AN EXISTING PAYMENT   --- TODO #1 (Varsha)
+# UPDATE AN EXISTING PAYMENT
 ######################################################################
 @app.route('/payments/<int:id>', methods=['PUT'])
 def update_payments(id):
     """
-    Update a Card
+    Update a Payment
     This endpoint will update a Payment resource based on the Payment Info in the body that is posted
     """
     check_content_type('application/json')
@@ -167,18 +167,18 @@ def update_payments(id):
 
 
 ######################################################################
-# DELETE A PAYMENT   --- TODO #2 (Shu)
+# DELETE A PAYMENT
 ######################################################################
-# @app.route('/cards/<int:card_id>', methods=['DELETE'])
-# def delete_cards(card_id):
-#     """
-#     Delete a Card
-#     This endpoint will delete a Card based the id specified in the path
-#     """
-#     card = Card.find(card_id)
-#     if card:
-#         card.delete()
-#     return make_response('', status.HTTP_204_NO_CONTENT)
+@app.route('/payments/<int:payment_id>', methods=['DELETE'])
+def delete_cards(payment_id):
+    """
+    Delete a Payment
+    This endpoint will delete a Payment for the payment id specified in the path
+    """
+    payment = Payment.find(payment_id)
+    if payment:
+        payment.delete()
+    return make_response('', status.HTTP_204_NO_CONTENT)
 
 
 ######################################################################
