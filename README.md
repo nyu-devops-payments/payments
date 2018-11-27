@@ -96,4 +96,4 @@ This endpoint will set a Payment as default for a customer. If the customer alre
 
 
 #### Test Code Coverage
-A code coverage of 93% has been achieved for the Payments API. Testing all endpoints + mock tests for bad requests.
+A code coverage of 97% has been achieved for the Payments API. Testing all endpoints + mock tests for bad requests.
