@@ -8,7 +8,7 @@ GET /payments/{id} - Returns the Payment with a given id number
 POST /payments - creates a new Payment record in database
 PUT /payments/{order_id} - updates a Payment record in database
 DELETE /payments/{id} - deletes a Payment record in database
-PUT /payments{id}/default - sets a Payment as default for the customer
+PUT /payments/{id}/default - sets a Payment as default for the customer
 """
 
 
