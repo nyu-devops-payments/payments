@@ -85,17 +85,15 @@ This endpoint will delete a Card based the id specified in the path.
 **number** (INTEGER) The payment ID
 
 
-### Perform Action - Set a Payment as Default  (#Todo Gideon)
-This endpoint will charge a purchase against a card.
+### Perform Action - Set a Payment as Default
+This endpoint will set a Payment as default for a customer. If the customer already has a default, it will be replaced.
 
-    PUT /cards/{number}/{amount}
+    PUT /payments/{id}/default
 
 #### Route Parameters
 
-**number** (INTEGER) The card ID
-
-**amount** (FLOAT) The amount to charge
+**id** (INTEGER) The Payment ID
 
 
 #### Test Code Coverage
-A code coverage of 93% has been achieved for the Payments API. Testing all endpoints + mock tests for bad requests.
+A code coverage of 97% has been achieved for the Payments API. Testing all endpoints + mock tests for bad requests.
