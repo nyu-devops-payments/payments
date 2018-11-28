@@ -15,6 +15,7 @@ Attributes:
 
 """
 import logging
+import json
 from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
 
@@ -30,7 +31,6 @@ class PaymentStatus(Enum):
    UNPAID = 1
    PROCESSING = 2
    PAID = 3
-
 
 
 class PaymentMethodType(Enum):
@@ -56,7 +56,6 @@ class Payment(db.Model):
     payment_status = db.Column(db.Enum(PaymentStatus))
     payment_method_type = db.Column(db.Enum(PaymentMethodType), nullable=False)
     default_payment_type = db.Column(db.Boolean, default=False)
-
 
     def __repr__(self):
         return '<Payment %r>' % (self.name)
@@ -104,8 +103,8 @@ class Payment(db.Model):
             self.customer_id = data['customer_id']
             self.order_id = data['order_id']
             self.payment_status = data['payment_status']
-	    self.payment_method_type = data['payment_method_type']
-	    self.default_payment_type = data['default_payment_type']
+            self.payment_method_type = data['payment_method_type']
+            self.default_payment_type = data['default_payment_type']
 
         except KeyError as error:
             raise DataValidationError('Invalid Payment Data: missing ' + error.args[0])

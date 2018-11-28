@@ -18,6 +18,7 @@ import logging
 import make_enum_json_serializable  # ADDED
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
+from flask_restplus import Api, Resource, fields
 from werkzeug.exceptions import NotFound
 
 # We use SQLAlchemy that supports SQLite, MySQL and PostgreSQL
@@ -28,183 +29,288 @@ from models import Payment, PaymentMethodType, PaymentStatus, DataValidationErro
 # Import Flask application
 from . import app
 
+
 ######################################################################
-# Error Handlers
+# Configure Swagger before initilaizing it
 ######################################################################
-@app.errorhandler(DataValidationError)
+api = Api(app,
+          version='1.0.0',
+          title='Payment REST API Service',
+          description='This is the payments server.',
+          doc='/'
+          # prefix='/api'
+         )
+
+# This namespace is the start of the path i.e., /payments
+ns = api.namespace('payments', description='Payment operations')
+
+
+# Define the model so that the docs reflect what can be sent
+payment_model = api.model('Payment', {
+    'id': fields.Integer(readOnly=True,
+                         description='The unique id assigned internally by service'),
+    'customer_id': fields.Integer(required=True,
+                          description='The id of the Customer'),
+    'order_id': fields.Integer(required=True,
+                              description='The order id'),
+    'payment_status': fields.String(required=True,
+                            description="The payment status", enum=["UNPAID","PROCESSING","PAID"]),
+    'payment_method_type': fields.String(required=True,
+                            description="The payment method type", enum=["CREDIT","DEBIT","PAYPAL"]),
+    'default_payment_type': fields.Boolean(required=True,
+                                description='Is the payment method set as the dafault?')
+
+})
+
+
+# ######################################################################
+# # Error Handlers
+# ######################################################################
+# @app.errorhandler(DataValidationError)
+# def request_validation_error(error):
+#     """ Handles Value Errors from bad data """
+#     return bad_request(error)
+#
+# @app.errorhandler(400)
+# def bad_request(error):
+#     """ Handles bad reuests with 400_BAD_REQUEST """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=400, error='Bad Request', message=message), 400
+#
+# @app.errorhandler(404)
+# def not_found(error):
+#     """ Handles resources not found with 404_NOT_FOUND """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=404, error='Not Found', message=message), 404
+#
+# @app.errorhandler(405)
+# def method_not_supported(error):
+#     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=405, error='Method not Allowed', message=message), 405
+#
+# @app.errorhandler(415)
+# def mediatype_not_supported(error):
+#     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=415, error='Unsupported media type', message=message), 415
+#
+# @app.errorhandler(500)
+# def internal_server_error(error):
+#     """ Handles unexpected server error with 500_SERVER_ERROR """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=500, error='Internal Server Error', message=message), 500
+
+######################################################################
+# Special Error Handlers
+######################################################################
+@api.errorhandler(DataValidationError)
 def request_validation_error(error):
     """ Handles Value Errors from bad data """
-    return bad_request(error)
-
-@app.errorhandler(400)
-def bad_request(error):
-    """ Handles bad reuests with 400_BAD_REQUEST """
     message = error.message or str(error)
     app.logger.info(message)
-    return jsonify(status=400, error='Bad Request', message=message), 400
+    return {'status':400, 'error': 'Bad Request', 'message': message}, 400
 
-@app.errorhandler(404)
-def not_found(error):
-    """ Handles resources not found with 404_NOT_FOUND """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=404, error='Not Found', message=message), 404
+# @api.errorhandler(DatabaseConnectionError)
+# def database_connection_error(error):
+#     """ Handles Database Errors from connection attempts """
+#     message = error.message or str(error)
+#     app.logger.critical(message)
+#     return {'status':500, 'error': 'Server Error', 'message': message}, 500
 
-@app.errorhandler(405)
-def method_not_supported(error):
-    """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=405, error='Method not Allowed', message=message), 405
 
-@app.errorhandler(415)
-def mediatype_not_supported(error):
-    """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=415, error='Unsupported media type', message=message), 415
-
-@app.errorhandler(500)
-def internal_server_error(error):
-    """ Handles unexpected server error with 500_SERVER_ERROR """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=500, error='Internal Server Error', message=message), 500
+######################################################################
+# GET HEALTH CHECK
+######################################################################
+@app.route('/healthcheck')
+def healthcheck():
+    """ Let them know our heart is still beating """
+    return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
 
 
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     """ Root URL response """
-    return jsonify(name='Payments REST API Service',
-                   version='1.0',
-                   paths=url_for('list_payments', _external=True)
-                  ), status.HTTP_200_OK
-
-
-######################################################################
-# LIST ALL PAYMENTS
-######################################################################
-@app.route('/payments', methods=['GET'])
-def list_payments():
-    """ Returns all Payments of all Customers """
-    payments = []
-    customer_id = request.args.get('customer_id')
-    order_id = request.args.get('order_id')
-    payment_method_type = request.args.get('payment_method_type')
-    payment_status = request.args.get('payment_status')
-
-    if customer_id:
-        payments = Payment.find_by_customer_id(customer_id)
-    elif order_id:
-        payments = Payment.find_by_order_id(order_id)
-    elif payment_method_type:
-        payments = Payment.find_by_payment_method_type(payment_method_type)
-    elif payment_status:
-        payments = Payment.find_by_payment_status(payment_status)
-    else:
-        payments = Payment.all()
-
-    results = [payment.serialize() for payment in payments]
-    return make_response(jsonify(results), status.HTTP_200_OK)
+    return make_response(jsonify(name='Payments REST API Service',
+                   doc=url_for('doc', _external=True)
+                  ), status.HTTP_200_OK)
 
 
 
 ######################################################################
-# RETRIEVES A SINGLE PAYMENT  ---
-#####################################################################
-@app.route('/payments/<int:id>', methods=['GET'])
-def get_payments(id):
+#  PATH: /pets/{id}
+######################################################################
+@ns.route('/<int:payment_id>')
+@ns.param('payment_id', 'The Payment identifier')
+class PaymentResource(Resource):
     """
-    Retrieves a single Payment for the customer
-    This endpoint will return a Payment based on it's id
+    PaymentResource class
+
+    Allows the manipulation of a single Payment
+    GET /payment{id} - Returns a payment with the id
+    PUT /payment{id} - Update a payment with the id
+    DELETE /payment{id} -  Deletes a payment with the id
     """
 
-    payment = Payment.find(id)
-    if not payment:
-        raise NotFound("Payment '{}' was not found.".format(id))
-    return make_response(jsonify(payment.serialize()), status.HTTP_200_OK)
+    #------------------------------------------------------------------
+    # RETRIEVE A PAYMENT
+    #------------------------------------------------------------------
+    @ns.doc('get_payments')
+    @ns.response(404, 'Payment not found')
+    @ns.marshal_with(payment_model)
+    def get(self, payment_id):
+        """
+        Retrieves a single Payment for the customer
+        This endpoint will return a Payment based on it's id
+        """
+        app.logger.info("Request to Retrieve a payment with id [%s]", payment_id)
+        payment = Payment.find(payment_id)
+        if not payment:
+            raise NotFound("Payment with id '{}' was not found.".format(payment_id))
+        return payment.serialize(), status.HTTP_200_OK
+
+    #------------------------------------------------------------------
+    # UPDATE AN EXISTING PAYMENT
+    #------------------------------------------------------------------
+    @ns.doc('update_payments')
+    @ns.response(404, 'Payment not found')
+    @ns.response(400, 'The posted Payment data was not valid')
+    @ns.expect(payment_model)
+    @ns.marshal_with(payment_model)
+    def put(self, payment_id):
+        """
+        Update a Payment
+        This endpoint will update a Payment resource based on the Payment Info in the body that is posted
+        """
+        app.logger.info('Request to Update a payment with id [%s]', payment_id)
+        check_content_type('application/json')
+        payment = Payment.find(payment_id)
+        if not payment:
+            raise NotFound('Payment with id [{}] was not found.'.format(payment_id))
+        #data = request.get_json()
+        data = api.payload
+        app.logger.info(data)
+        payment.deserialize(data)
+        payment.id = payment_id
+        payment.save()
+        return payment.serialize(), status.HTTP_200_OK
+
+    #------------------------------------------------------------------
+    # DELETE A PAYMENT
+    #------------------------------------------------------------------
+    @ns.doc('delete_payments')
+    @ns.response(204, 'Payment deleted')
+    def delete(self, payment_id):
+        """
+        Delete a Payment
+        This endpoint will delete a Payment based the id specified in the path
+        """
+        app.logger.info('Request to Delete a payment with id [%s]', payment_id)
+        payment = Payment.find(payment_id)
+        if payment:
+            payment.delete()
+        return '', status.HTTP_204_NO_CONTENT
+
 
 
 ######################################################################
-# ADDS A NEW PAYMENT
+#  PATH: /payments
 ######################################################################
-@app.route('/payments', methods=['POST'])
-def create_payments():
-    """
-    Creates a Payment Method
-    This endpoint will create a Payment source based on the Payment Info in the body that is posted
-    """
-    check_content_type('application/json')
-    payment = Payment()
-    payment.deserialize(request.get_json())
-    payment.save()
-    message = payment.serialize()
-    location_url = url_for('get_payments', id=payment.id, _external=True)
-    return make_response(jsonify(message), status.HTTP_201_CREATED,
-                         {
-                             'Location': location_url
-                         })
+@ns.route('/', strict_slashes=False)
+class PaymentCollection(Resource):
+    """ Handles all interactions with collections of Payments """
+    #------------------------------------------------------------------
+    # LIST ALL PAYMENTS
+    #------------------------------------------------------------------
+    @ns.doc('list_payments')
+    @ns.param('category', 'List Payments by category')
+    @ns.marshal_list_with(payment_model)
+    def get(self):
+        """ Returns all of the Payments """
+        app.logger.info('Request to list Payments...')
+        payments = []
+        customer_id = request.args.get('customer_id')
+        order_id = request.args.get('order_id')
+        payment_method_type = request.args.get('payment_method_type')
+        payment_status = request.args.get('payment_status')
+        if customer_id:
+            payments = Payment.find_by_customer_id(customer_id)
+        elif order_id:
+            payments = Payment.find_by_order_id(order_id)
+        elif payment_method_type:
+            payments = Payment.find_by_payment_method_type(payment_method_type)
+        elif payment_status:
+            payments = Payment.find_by_payment_status(payment_status)
+        else:
+            payments = Payment.all()
+
+        # app.logger.info('[%s] Payments returned', len(payments))
+        results = [payment.serialize() for payment in payments]
+        return results, status.HTTP_200_OK
+
+
+    #------------------------------------------------------------------
+    # ADD A NEW PAYMENT
+    #------------------------------------------------------------------
+    @ns.doc('create_payments')
+    @ns.expect(payment_model)
+    @ns.response(400, 'The posted data was not valid')
+    @ns.response(201, 'Pet created successfully')
+    @ns.marshal_with(payment_model, code=201)
+    def post(self):
+        """
+        Creates a Payment
+        This endpoint will create a Payment based the data in the body that is posted
+        """
+        app.logger.info('Request to Create a Payment')
+        check_content_type('application/json')
+        payment = Payment()
+        app.logger.info('Payload = %s', api.payload)
+        payment.deserialize(api.payload)
+        payment.save()
+        app.logger.info('Payment with new id [%s] saved!', payment.id)
+        location_url = api.url_for(PaymentResource, payment_id=payment.id, _external=True)
+        return payment.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
+
 
 ######################################################################
-# UPDATE AN EXISTING PAYMENT
+#  PATH: /payments/{id}/default
 ######################################################################
-@app.route('/payments/<int:id>', methods=['PUT'])
-def update_payments(id):
-    """
-    Update a Payment
-    This endpoint will update a Payment resource based on the Payment Info in the body that is posted
-    """
-    check_content_type('application/json')
-    payment = Payment.find(id)
-    if not payment:
-        raise NotFound("Payment '{}' was not found.".format(id))
-    payment.deserialize(request.get_json())
-    payment.save()
-    message = payment.serialize()
-    return make_response(jsonify(message), status.HTTP_200_OK)
+@ns.route('/<int:payment_id>/default')
+@ns.param('payment_id', 'The Payment identifier')
+class PurchaseResource(Resource):
+    """ Purchase actions on a Payment """
+    @ns.doc('purchase_payments')
+    @ns.response(404, 'Payment not found')
+    @ns.response(409, 'The Payment is not available for purchase')
+    def put(self, payment_id):
+        """
+        Set default payment source
+        This endpoint will set a Payment source as the default
+        """
+        app.logger.info('Request to set a Payment as default')
+        payment = Payment.find(payment_id)
+        if not payment:
+            raise NotFound("Payment with id '{}' was not found.".format(payment_id))
 
+        allpayments = Payment.find_by_customer_id(payment.customer_id)
+        for p in allpayments:
+            p.unset_default()
+            p.save()
 
-######################################################################
-# DELETE A PAYMENT
-######################################################################
-@app.route('/payments/<int:payment_id>', methods=['DELETE'])
-def delete_cards(payment_id):
-    """
-    Delete a Payment
-    This endpoint will delete a Payment for the payment id specified in the path
-    """
-    payment = Payment.find(payment_id)
-    if payment:
-        payment.delete()
-    return make_response('', status.HTTP_204_NO_CONTENT)
+        payment.set_default()
+        payment.save()
+        app.logger.info('Payment with id [%s] has been set as default!', payment.id)
+        return payment.serialize(), status.HTTP_200_OK
 
-
-######################################################################
-#   PERFORM ACTIONS - SET DEFAULT PAYMENT
-######################################################################
-
-@app.route('/payments/<int:id>/default', methods=['PUT'])
-def set_default(id):
-    """
-    Set default payment source
-    This endpoint will set a payment source as the default
-    """
-    payment = Payment.find(id)
-    if not payment:
-        raise NotFound("Payment with id '{}' was not found.".format(id))
-
-    allpayments = Payment.find_by_customer_id(payment.customer_id)
-    for p in allpayments:
-        p.unset_default()
-        p.save()
-
-    payment.set_default()
-    payment.save()
-    message = payment.serialize()
-    return make_response(jsonify(message), status.HTTP_200_OK)
 
 ######################################################################
 #   INTERNAL SERVER ERROR
@@ -217,9 +323,10 @@ def index1():
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
+@app.before_first_request
 def init_db():
     """ Initialies the SQLAlchemy app """
-    global app
+    # global app
     Payment.init_db(app)
 
 
@@ -228,7 +335,7 @@ def check_content_type(content_type):
     if request.headers['Content-Type'] == content_type:
         return
     app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
-    abort(415, 'Content-Type must be {}'.format(content_type))
+    abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
 
 
 def initialize_logging(log_level=logging.INFO):
