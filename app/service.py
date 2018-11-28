@@ -37,7 +37,7 @@ api = Api(app,
           version='1.0.0',
           title='Payment REST API Service',
           description='This is the payments server.',
-          doc='/apidocs/'
+          doc='/'
           # prefix='/api'
          )
 
@@ -252,135 +252,39 @@ class PaymentCollection(Resource):
         else:
             payments = Payment.all()
 
-        app.logger.info('[%s] Payments returned', len(payments))
+        # app.logger.info('[%s] Payments returned', len(payments))
         results = [payment.serialize() for payment in payments]
         return results, status.HTTP_200_OK
 
 
-# ######################################################################
-# # LIST ALL PAYMENTS
-# ######################################################################
-# @app.route('/payments', methods=['GET'])
-# def list_payments():
-#     """ Returns all Payments of all Customers """
-#     payments = []
-#     customer_id = request.args.get('customer_id')
-#     order_id = request.args.get('order_id')
-#     payment_method_type = request.args.get('payment_method_type')
-#     payment_status = request.args.get('payment_status')
-#
-#     if customer_id:
-#         payments = Payment.find_by_customer_id(customer_id)
-#     elif order_id:
-#         payments = Payment.find_by_order_id(order_id)
-#     elif payment_method_type:
-#         payments = Payment.find_by_payment_method_type(payment_method_type)
-#     elif payment_status:
-#         payments = Payment.find_by_payment_status(payment_status)
-#     else:
-#         payments = Payment.all()
-#
-#     results = [payment.serialize() for payment in payments]
-#     return make_response(jsonify(results), status.HTTP_200_OK)
-#
-#     #------------------------------------------------------------------
-#     # ADD A NEW PAYMENT
-#     #------------------------------------------------------------------
-#     @ns.doc('create_payments')
-#     @ns.expect(payment_model)
-#     @ns.response(400, 'The posted data was not valid')
-#     @ns.response(201, 'Pet created successfully')
-#     @ns.marshal_with(payment_model, code=201)
-#     def post(self):
-#         """
-#         Creates a Payment
-#         This endpoint will create a Payment based the data in the body that is posted
-#         """
-#         app.logger.info('Request to Create a Payment')
-#         check_content_type('application/json')
-#         payment = Payment()
-#         app.logger.info('Payload = %s', api.payload)
-#         payment.deserialize(api.payload)
-#         payment.save()
-#         app.logger.info('Payment with new id [%s] saved!', payment.id)
-#         location_url = api.url_for(PaymentResource, payment_id=payment.id, _external=True)
-#         return payment.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
-#
-#
-# ######################################################################
-# # RETRIEVES A SINGLE PAYMENT  ---
-# #####################################################################
-# @app.route('/payments/<int:id>', methods=['GET'])
-# def get_payments(id):
-#     """
-#     Retrieves a single Payment for the customer
-#     This endpoint will return a Payment based on it's id
-#     """
-#
-#     payment = Payment.find(id)
-#     if not payment:
-#         raise NotFound("Payment '{}' was not found.".format(id))
-#     return make_response(jsonify(payment.serialize()), status.HTTP_200_OK)
-#
-#
-# ######################################################################
-# # ADDS A NEW PAYMENT
-# ######################################################################
-# @app.route('/payments', methods=['POST'])
-# def create_payments():
-#     """
-#     Creates a Payment Method
-#     This endpoint will create a Payment source based on the Payment Info in the body that is posted
-#     """
-#     check_content_type('application/json')
-#     payment = Payment()
-#     payment.deserialize(request.get_json())
-#     payment.save()
-#     message = payment.serialize()
-#     location_url = url_for('get_payments', id=payment.id, _external=True)
-#     return make_response(jsonify(message), status.HTTP_201_CREATED,
-#                          {
-#                              'Location': location_url
-#                          })
-#
-# ######################################################################
-# # UPDATE AN EXISTING PAYMENT
-# ######################################################################
-# @app.route('/payments/<int:id>', methods=['PUT'])
-# def update_payments(id):
-#     """
-#     Update a Payment
-#     This endpoint will update a Payment resource based on the Payment Info in the body that is posted
-#     """
-#     check_content_type('application/json')
-#     payment = Payment.find(id)
-#     if not payment:
-#         raise NotFound("Payment '{}' was not found.".format(id))
-#     payment.deserialize(request.get_json())
-#     payment.save()
-#     message = payment.serialize()
-#     return make_response(jsonify(message), status.HTTP_200_OK)
-#
-#
-# ######################################################################
-# # DELETE A PAYMENT
-# ######################################################################
-# @app.route('/payments/<int:payment_id>', methods=['DELETE'])
-# def delete_cards(payment_id):
-#     """
-#     Delete a Payment
-#     This endpoint will delete a Payment for the payment id specified in the path
-#     """
-#     payment = Payment.find(payment_id)
-#     if payment:
-#         payment.delete()
-#     return make_response('', status.HTTP_204_NO_CONTENT)
+    #------------------------------------------------------------------
+    # ADD A NEW PAYMENT
+    #------------------------------------------------------------------
+    @ns.doc('create_payments')
+    @ns.expect(payment_model)
+    @ns.response(400, 'The posted data was not valid')
+    @ns.response(201, 'Pet created successfully')
+    @ns.marshal_with(payment_model, code=201)
+    def post(self):
+        """
+        Creates a Payment
+        This endpoint will create a Payment based the data in the body that is posted
+        """
+        app.logger.info('Request to Create a Payment')
+        check_content_type('application/json')
+        payment = Payment()
+        app.logger.info('Payload = %s', api.payload)
+        payment.deserialize(api.payload)
+        payment.save()
+        app.logger.info('Payment with new id [%s] saved!', payment.id)
+        location_url = api.url_for(PaymentResource, payment_id=payment.id, _external=True)
+        return payment.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
 
 
 ######################################################################
 #  PATH: /payments/{id}/default
 ######################################################################
-@ns.route('/<int:payment_id>/purchase')
+@ns.route('/<int:payment_id>/default')
 @ns.param('payment_id', 'The Payment identifier')
 class PurchaseResource(Resource):
     """ Purchase actions on a Payment """
@@ -407,29 +311,6 @@ class PurchaseResource(Resource):
         app.logger.info('Payment with id [%s] has been set as default!', payment.id)
         return payment.serialize(), status.HTTP_200_OK
 
-# ######################################################################
-# #   PERFORM ACTIONS - SET DEFAULT PAYMENT
-# ######################################################################
-#
-# @app.route('/payments/<int:id>/default', methods=['PUT'])
-# def set_default(id):
-#     """
-#     Set default payment source
-#     This endpoint will set a payment source as the default
-#     """
-#     payment = Payment.find(id)
-#     if not payment:
-#         raise NotFound("Payment with id '{}' was not found.".format(id))
-#
-#     allpayments = Payment.find_by_customer_id(payment.customer_id)
-#     for p in allpayments:
-#         p.unset_default()
-#         p.save()
-#
-#     payment.set_default()
-#     payment.save()
-#     message = payment.serialize()
-#     return make_response(jsonify(message), status.HTTP_200_OK)
 
 ######################################################################
 #   INTERNAL SERVER ERROR
