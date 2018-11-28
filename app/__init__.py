@@ -20,4 +20,6 @@ if __name__ != '__main__':
         app.logger.handlers = gunicorn_logger.handlers
         app.logger.setLevel(gunicorn_logger.level)
 
+db = SQLAlchemy(app)
+app.config.from_object('config')
 app.logger.info('Logging established')
