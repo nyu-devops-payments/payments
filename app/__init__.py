@@ -5,6 +5,7 @@ Package for the application models and services
 This module also sets up the logging to be used with gunicorn
 """
 import logging
+from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 
 # Create Flask application
