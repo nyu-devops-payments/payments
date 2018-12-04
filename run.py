@@ -3,7 +3,6 @@ Payment Service Runner
 
 Starts the Payment Service and initializes logging
 """
-
 import os
 from app import app, service
 

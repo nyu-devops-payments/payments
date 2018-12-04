@@ -4,7 +4,7 @@ applications:
 - name: nyu-payment-service-f18
   memory: 64M
   instances: 2
-  timeout: 180
+  timeout: 380
   #random-route: true
   host: nyu-payment-service-f18
   domain: mybluemix.net
@@ -13,7 +13,9 @@ applications:
   buildpack: python_buildpack
   command: gunicorn --bind=0.0.0.0:$PORT service:app
   services:
-  - Cloudant
+  - Db2
   env:
     FLASK_APP : server
     FLASK_DEBUG : false
+
+---

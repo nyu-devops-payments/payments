@@ -5,8 +5,11 @@ Package for the application models and services
 This module also sets up the logging to be used with gunicorn
 """
 import logging
-from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+import sqlalchemy
+from sqlalchemy import *
 
 # Create Flask application
 app = Flask(__name__)
@@ -25,5 +28,6 @@ if __name__ != '__main__':
 app.config.from_object('config')
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
+#db = sqlalchemy.create_engine('ibm_db_sa://db2inst1:secret@host.name.com:50000/pydev')
 
 app.logger.info('Logging established')
