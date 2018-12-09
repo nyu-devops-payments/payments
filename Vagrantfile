@@ -56,15 +56,6 @@ Vagrant.configure(2) do |config|
   SHELL
 
   ######################################################################
-  # Add CouchDB docker container
-  ######################################################################
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo mkdir -p /opt/postgresdb/data
-    sudo chown vagrant:vagrant /opt/postgresdb/data
-  SHELL
-
-
-  ######################################################################
   # Add PostgreSQL docker container
   ######################################################################
   config.vm.provision "docker" do |d|
