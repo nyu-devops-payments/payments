@@ -56,20 +56,14 @@ Vagrant.configure(2) do |config|
   SHELL
 
   ######################################################################
-  # Add CouchDB docker container
+  # Add PostgreSQL docker container
   ######################################################################
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo mkdir -p /opt/couchdb/data
-    sudo chown vagrant:vagrant /opt/couchdb/data
-  SHELL
-
-  # Add CouchDB docker container
-  # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
   config.vm.provision "docker" do |d|
-    d.pull_images "couchdb"
-    d.run "couchdb",
-      args: "--restart=always -d --name couchdb -p 5984:5984 -v /opt/couchdb/data:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
+    d.pull_images "postgres"
+    d.run "postgres",
+       args: "-d --name postgres -p 5432:5432 -v postgresql_data:/var/lib/postgresql/data"
   end
+
 
   ######################################################################
   # Setup a Bluemix and Kubernetes environment
@@ -94,5 +88,18 @@ Vagrant.configure(2) do |config|
     echo " kubectl proxy --address='0.0.0.0'"
     echo "************************************\n"
   SHELL
+
+  # Create the database after Docker is running
+    config.vm.provision "shell", inline: <<-SHELL
+      # Wait for mariadb to come up
+      echo "Waiting 20 seconds for PostgreSQL to start..."
+      sleep 20
+      cd /vagrant
+      docker exec postgres psql -U postgres -c "CREATE DATABASE development;"
+      python manage.py development
+      docker exec postgres psql -U postgres -c "CREATE DATABASE test;"
+      python manage.py test
+      cd
+    SHELL
 
 end

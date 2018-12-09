@@ -8,7 +8,8 @@ from mock import MagicMock, patch
 from app.models import Payment, PaymentMethodType, PaymentStatus, DataValidationError, db
 import app.service as service
 
-DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
+DATABASE_URI = os.getenv('DATABASE_URI', None)
+#DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 
 ######################################################################
 #  T E S T   C A S E S
@@ -22,11 +23,19 @@ class TestPaymentServer(unittest.TestCase):
         service.app.debug = False
         service.initialize_logging(logging.INFO)
         # Set up the test database
-        service.app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+        if DATABASE_URI:
+            service.app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
     @classmethod
     def tearDownClass(cls):
         pass
+
+    def test_index(self):
+        """ Test the Home Page """
+        resp = self.app.get('/')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        #self.assertTrue('Payments REST API Service' in resp.data)
+
 
     def setUp(self):
         """ Runs before each test """
@@ -44,14 +53,6 @@ class TestPaymentServer(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-
-
-    # def test_index(self):
-    #     """ Test the Home Page """
-    #     resp = self.app.get('/')
-    #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
-    #     data = json.loads(resp.data)
-    #     self.assertEqual(data['name'], 'Payments REST API Service')
 
 
     def test_get_payments_list(self):

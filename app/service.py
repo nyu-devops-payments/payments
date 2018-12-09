@@ -30,6 +30,7 @@ from models import Payment, PaymentMethodType, PaymentStatus, DataValidationErro
 from . import app
 
 
+
 ######################################################################
 # Configure Swagger before initilaizing it
 ######################################################################
@@ -62,6 +63,16 @@ payment_model = api.model('Payment', {
 
 })
 
+
+######################################################################
+# GET INDEX
+######################################################################
+@app.route('/', methods=['GET'])
+def index():
+    """ Root URL response """
+    return make_response(jsonify(name='Payments REST API Service',
+                   doc=url_for('doc', _external=True)
+                  ), status.HTTP_200_OK)
 
 # ######################################################################
 # # Error Handlers
@@ -131,17 +142,6 @@ def request_validation_error(error):
 def healthcheck():
     """ Let them know our heart is still beating """
     return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
-
-
-######################################################################
-# GET INDEX
-######################################################################
-@app.route('/', methods=['GET'])
-def index():
-    """ Root URL response """
-    return make_response(jsonify(name='Payments REST API Service',
-                   doc=url_for('doc', _external=True)
-                  ), status.HTTP_200_OK)
 
 
 

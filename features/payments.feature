@@ -16,6 +16,13 @@ Scenario: The server is running
     Then I should see "Payments RESTful Service" in the title
     And I should not see "404 Not Found"
 
+Scenario: Create a Pet
+    When I visit the "Home Page"
+    And I set the "Name" to "Happy"
+    And I set the "Category" to "Hippo"
+    And I press the "Create" button
+    Then I should see the message "Success"
+
 Scenario: Update a payment
     When I visit the "Home Page"
     And I set the "id" to "1"
