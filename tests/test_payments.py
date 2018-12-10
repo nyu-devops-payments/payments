@@ -1,6 +1,7 @@
 import unittest
 import os
-from app.models import Payment, PaymentMethodType, PaymentStatus, DataValidationError, db
+from app.models import Payment, PaymentMethodType, PaymentStatus, db
+from app.custom_exceptions import DataValidationError
 from app import app
 
 DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')

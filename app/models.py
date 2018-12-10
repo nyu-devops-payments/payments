@@ -19,11 +19,7 @@ import json
 import logging
 from . import db
 from enum import Enum
-
-
-class DataValidationError(Exception):
-    """ Used for an data validation errors when deserializing """
-    pass
+from app.custom_exceptions import DataValidationError
 
 
 class PaymentStatus(Enum):
@@ -117,11 +113,13 @@ class Payment(db.Model):
     def init_db():
         """ Initializes the database session """
         Payment.logger.info('Initializing database')
-        # This is where we initialize SQLAlchemy from the Flask app
-        #db.init_app(app)
-        #app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
 
+    @staticmethod
+    def remove_all():
+        """ Removes all Payments from the database """
+        db.drop_all()    # clean up the last tests
+        db.create_all()  # create new tables
 
     @staticmethod
     def all():
