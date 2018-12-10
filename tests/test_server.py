@@ -186,10 +186,12 @@ class TestPaymentServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         # Confirm first is true
+        payment = Payment.find_by_order_id(11150)[0]
         temp1 = Payment.find_by_order_id(payment.order_id)[0]
         self.assertEqual(temp1.default_payment_type, True)
 
         # Confirm second is still false
+        payment2 = Payment.find_by_order_id(12143)[0]
         temp2 = Payment.find_by_order_id(payment2.order_id)[0]
         self.assertEqual(temp2.default_payment_type, False)
 
@@ -198,10 +200,12 @@ class TestPaymentServer(unittest.TestCase):
         self.assertEqual(resp2.status_code, status.HTTP_200_OK)
 
         # Confirm first is false
+        payment = Payment.find_by_order_id(11150)[0]
         temp3 = Payment.find(payment.id)
         self.assertEqual(temp3.default_payment_type, False)
 
         # Confirm second is true
+        payment2 = Payment.find_by_order_id(12143)[0]
         temp4 = Payment.find(payment2.id)
         self.assertEqual(temp4.default_payment_type, True)
 

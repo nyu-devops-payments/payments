@@ -16,7 +16,7 @@
 Microservice module
 
 This module contains the microservice code for
-    server
+    service
     models
 """
 from flask import Flask
@@ -32,12 +32,7 @@ app = Flask(__name__)
 # Load the confguration
 with app.app_context():
     app.config.from_object('config')
-    print 'Setting up logging for {}...'.format(__name__)
-    if __name__ != '__main__':
-        gunicorn_logger = app.logger.debug('Database URI {}'.format(app.config['SQLALCHEMY_DATABASE_URI']))
-        if gunicorn_logger:
-            app.logger.handlers = gunicorn_logger.handlers
-            app.logger.setLevel(gunicorn_logger.level)
+    app.logger.debug('Database URI {}'.format(app.config['SQLALCHEMY_DATABASE_URI']))
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)

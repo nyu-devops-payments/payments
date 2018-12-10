@@ -17,5 +17,6 @@ applications:
   env:
     FLASK_APP : server
     FLASK_DEBUG : false
+    #FLASK_ENV: development flask run
 
 ---
