@@ -22,7 +22,7 @@ class TestPayments(unittest.TestCase):
         pass
 
     def setUp(self):
-        Payment.init_db(app)
+        Payment.init_db()
         db.drop_all()    # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
 

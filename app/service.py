@@ -11,8 +11,6 @@ DELETE /payments/{id} - deletes a Payment record in database
 PUT /payments/{id}/default - sets a Payment as default for the customer
 """
 
-
-import os
 import sys
 import logging
 import make_enum_json_serializable  # ADDED
@@ -22,12 +20,9 @@ from flask_restplus import Api, Resource, fields
 from werkzeug.exceptions import NotFound
 
 # We use SQLAlchemy that supports SQLite, MySQL and PostgreSQL
-from flask_sqlalchemy import SQLAlchemy
-from models import Payment, PaymentMethodType, PaymentStatus, DataValidationError
+from app.models import Payment, PaymentMethodType, PaymentStatus, DataValidationError
+from app import app
 
-
-# Import Flask application
-from . import app
 
 
 
@@ -234,7 +229,7 @@ class PaymentCollection(Resource):
     @ns.param('category', 'List Payments by category')
     @ns.marshal_list_with(payment_model)
     def get(self):
-        """ Returns all of the Payments """
+        """ Returns all of the Payments made by all Customers """
         app.logger.info('Request to list Payments...')
         payments = []
         customer_id = request.args.get('customer_id')
@@ -262,8 +257,8 @@ class PaymentCollection(Resource):
     #------------------------------------------------------------------
     @ns.doc('create_payments')
     @ns.expect(payment_model)
-    @ns.response(400, 'The posted data was not valid')
-    @ns.response(201, 'Pet created successfully')
+    @ns.response(400, 'The posted data for making a payment was not valid')
+    @ns.response(201, 'Payment Method created successfully!')
     @ns.marshal_with(payment_model, code=201)
     def post(self):
         """
@@ -285,12 +280,12 @@ class PaymentCollection(Resource):
 #  PATH: /payments/{id}/default
 ######################################################################
 @ns.route('/<int:payment_id>/default')
-@ns.param('payment_id', 'The Payment identifier')
+@ns.param('payment_id', 'The Payment Identifier')
 class PurchaseResource(Resource):
     """ Purchase actions on a Payment """
     @ns.doc('purchase_payments')
-    @ns.response(404, 'Payment not found')
-    @ns.response(409, 'The Payment is not available for purchase')
+    @ns.response(404, 'Payment Method not found')
+    @ns.response(409, 'The Payment Method is not available for purchase')
     def put(self, payment_id):
         """
         Set default payment source
@@ -327,7 +322,7 @@ def index1():
 def init_db():
     """ Initialies the SQLAlchemy app """
     # global app
-    Payment.init_db(app)
+    Payment.init_db()
 
 
 def check_content_type(content_type):
