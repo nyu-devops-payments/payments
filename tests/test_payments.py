@@ -1,6 +1,7 @@
 import unittest
 import os
-from app.models import Payment, PaymentMethodType, PaymentStatus, DataValidationError, db
+from app.models import Payment, PaymentMethodType, PaymentStatus, db
+from app.custom_exceptions import DataValidationError
 from app import app
 
 DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
@@ -22,7 +23,7 @@ class TestPayments(unittest.TestCase):
         pass
 
     def setUp(self):
-        Payment.init_db(app)
+        Payment.init_db()
         db.drop_all()    # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
 

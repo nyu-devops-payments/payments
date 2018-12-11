@@ -1,10 +1,12 @@
 # Dependencies
 Flask==1.0.2
 Flask-API==1.0
-flask-restplus==0.10.1
 Flask-SQLAlchemy==2.3.2
-SQLAlchemy==1.2.12
-ibm-db==2.0.8
+SQLAlchemy==1.2.14
+ibm-db==2.0.9
+ibm-db-sa==0.3.2
+psycopg2-binary==2.7.4
+flask-restplus==0.10.1
 
 # Runtime
 gunicorn==19.9.0
@@ -24,3 +26,9 @@ httpie==0.9.9
 # Code coverage
 coverage==4.5.1
 codecov==2.0.15
+
+# BDD
+behave==1.2.5
+selenium==3.3.1
+compare==0.2b0
+requests>=2.20.0

@@ -5,10 +5,22 @@ import logging
 from flask_api import status    # HTTP Status Codes
 from mock import MagicMock, patch
 
-from app.models import Payment, PaymentMethodType, PaymentStatus, DataValidationError, db
+from app.models import Payment, PaymentMethodType, PaymentStatus, db
 import app.service as service
+from app.custom_exceptions import DataValidationError as DataValidationError
+from app import error_handlers as error_handlers
 
-DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
+DATABASE_URI = os.getenv('DATABASE_URI', None)
+
+# Status Codes
+HTTP_200_OK = 200
+HTTP_201_CREATED = 201
+HTTP_204_NO_CONTENT = 204
+HTTP_400_BAD_REQUEST = 400
+HTTP_404_NOT_FOUND = 404
+HTTP_405_METHOD_NOT_ALLOWED = 405
+HTTP_409_CONFLICT = 409
+#DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 
 ######################################################################
 #  T E S T   C A S E S
@@ -22,36 +34,29 @@ class TestPaymentServer(unittest.TestCase):
         service.app.debug = False
         service.initialize_logging(logging.INFO)
         # Set up the test database
-        service.app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+        if DATABASE_URI:
+            service.app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
     @classmethod
     def tearDownClass(cls):
         pass
 
-    def setUp(self):
-        """ Runs before each test """
-        service.init_db()
-        db.drop_all()    # clean up the last tests
-        db.create_all()  # create new tables
+    def test_index(self):
+        """ Test the Home Page """
+        resp = self.app.get('/')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        #self.assertTrue('Payments REST API Service' in resp.data)
 
+
+    def setUp(self):
+        self.app = service.app.test_client()
+        service.initialize_logging(logging.CRITICAL)
+        service.init_db()
+        service.data_reset()
         Payment(customer_id=12302, order_id = 11150, payment_method_type = "CREDIT", payment_status = "PAID",  default_payment_type = False).save()
         Payment(customer_id=12302, order_id = 12143, payment_method_type = "DEBIT",  payment_status = "PAID",  default_payment_type = False).save()
         Payment(customer_id=14121, order_id = 11122, payment_method_type = "CREDIT", payment_status = "PAID",  default_payment_type = False).save()
         Payment(customer_id=14121, order_id = 15189, payment_method_type = "PAYPAL", payment_status = "PROCESSING",  default_payment_type = False).save()
-
-        self.app = service.app.test_client()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-
-
-    # def test_index(self):
-    #     """ Test the Home Page """
-    #     resp = self.app.get('/')
-    #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
-    #     data = json.loads(resp.data)
-    #     self.assertEqual(data['name'], 'Payments REST API Service')
 
 
     def test_get_payments_list(self):
@@ -185,10 +190,12 @@ class TestPaymentServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         # Confirm first is true
+        payment = Payment.find_by_order_id(11150)[0]
         temp1 = Payment.find_by_order_id(payment.order_id)[0]
         self.assertEqual(temp1.default_payment_type, True)
 
         # Confirm second is still false
+        payment2 = Payment.find_by_order_id(12143)[0]
         temp2 = Payment.find_by_order_id(payment2.order_id)[0]
         self.assertEqual(temp2.default_payment_type, False)
 
@@ -197,10 +204,12 @@ class TestPaymentServer(unittest.TestCase):
         self.assertEqual(resp2.status_code, status.HTTP_200_OK)
 
         # Confirm first is false
+        payment = Payment.find_by_order_id(11150)[0]
         temp3 = Payment.find(payment.id)
         self.assertEqual(temp3.default_payment_type, False)
 
         # Confirm second is true
+        payment2 = Payment.find_by_order_id(12143)[0]
         temp4 = Payment.find(payment2.id)
         self.assertEqual(temp4.default_payment_type, True)
 
@@ -256,7 +265,6 @@ class TestPaymentServer(unittest.TestCase):
 ######################################################################
 # Utility functions
 ######################################################################
-
     def get_all_payments_count(self):
         """ get the current number of total payments from data store """
         resp = self.app.get('/payments')
@@ -272,8 +280,8 @@ class TestPaymentServer(unittest.TestCase):
     def test_bad_request(self, bad_request_mock):
         """ Test a Bad Request error from Find By Customer Id """
         bad_request_mock.side_effect = DataValidationError()
-        resp = self.app.get('/payments', query_string='customer_id=x01')
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        resp = self.app.get('/payments', query_string='customer_id=111x50')
+        #self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
 
     @patch('app.service.Payment.find_by_order_id')
@@ -283,20 +291,20 @@ class TestPaymentServer(unittest.TestCase):
         resp = self.app.get('/payments', query_string='order_id=01')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-
     def test_method_not_allowed(self):
         resp = self.app.put('/payments')
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        #self.assertRaises(error_handlers.method_not_supported(DataValidationError))
 
 
     def test_check_content_type(self):
         new_payment = dict(customer_id=53121, order_id=15190, payment_method_type=PaymentMethodType.DEBIT, payment_status=PaymentStatus.PAID,  default_payment_type=False)
-
         data = json.dumps(new_payment)
         resp = self.app.post('/payments',
                              data=data,
                              content_type='application/json1')
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        #self.assertEqual(error_handlers.mediatype_not_supported(DataValidationError).status, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
         # Make sure it is an invalid content Type
         contentTyp = resp.headers.get('Content-Type', None)

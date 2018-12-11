@@ -14,17 +14,12 @@ Attributes:
 
 
 """
-import logging
+import os
 import json
+import logging
+from . import db
 from enum import Enum
-from flask_sqlalchemy import SQLAlchemy
-
-# Create the SQLAlchemy object to be initialized later in init_db()
-db = SQLAlchemy()
-
-class DataValidationError(Exception):
-    """ Used for an data validation errors when deserializing """
-    pass
+from app.custom_exceptions import DataValidationError
 
 
 class PaymentStatus(Enum):
@@ -115,15 +110,16 @@ class Payment(db.Model):
 
 
     @staticmethod
-    def init_db(app):
+    def init_db():
         """ Initializes the database session """
         Payment.logger.info('Initializing database')
-        Payment.app = app
-        # This is where we initialize SQLAlchemy from the Flask app
-        db.init_app(app)
-        app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
 
+    @staticmethod
+    def remove_all():
+        """ Removes all Payments from the database """
+        db.drop_all()    # clean up the last tests
+        db.create_all()  # create new tables
 
     @staticmethod
     def all():

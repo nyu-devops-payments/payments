@@ -23,12 +23,23 @@ from werkzeug.exceptions import NotFound
 
 # We use SQLAlchemy that supports SQLite, MySQL and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from models import Payment, PaymentMethodType, PaymentStatus, DataValidationError
-
-
+from models import Payment, PaymentMethodType, PaymentStatus, db
 # Import Flask application
 from . import app
+# Error handlers reuire app to be initialized so we must import
+# then only after we have initialized the Flask app instance
+from . import error_handlers
 
+######################################################################
+# GET INDEX
+######################################################################
+@app.route('/', methods=['GET'])
+def index():
+    """ Root URL response """
+    # return make_response(jsonify(name='Payments REST API Service',
+    #                doc=url_for('doc', _external=True)
+    #               ), status.HTTP_200_OK)
+    return app.send_static_file('index.html')
 
 ######################################################################
 # Configure Swagger before initilaizing it
@@ -62,68 +73,6 @@ payment_model = api.model('Payment', {
 
 })
 
-
-# ######################################################################
-# # Error Handlers
-# ######################################################################
-# @app.errorhandler(DataValidationError)
-# def request_validation_error(error):
-#     """ Handles Value Errors from bad data """
-#     return bad_request(error)
-#
-# @app.errorhandler(400)
-# def bad_request(error):
-#     """ Handles bad reuests with 400_BAD_REQUEST """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=400, error='Bad Request', message=message), 400
-#
-# @app.errorhandler(404)
-# def not_found(error):
-#     """ Handles resources not found with 404_NOT_FOUND """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=404, error='Not Found', message=message), 404
-#
-# @app.errorhandler(405)
-# def method_not_supported(error):
-#     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=405, error='Method not Allowed', message=message), 405
-#
-# @app.errorhandler(415)
-# def mediatype_not_supported(error):
-#     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=415, error='Unsupported media type', message=message), 415
-#
-# @app.errorhandler(500)
-# def internal_server_error(error):
-#     """ Handles unexpected server error with 500_SERVER_ERROR """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=500, error='Internal Server Error', message=message), 500
-
-######################################################################
-# Special Error Handlers
-######################################################################
-@api.errorhandler(DataValidationError)
-def request_validation_error(error):
-    """ Handles Value Errors from bad data """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return {'status':400, 'error': 'Bad Request', 'message': message}, 400
-
-# @api.errorhandler(DatabaseConnectionError)
-# def database_connection_error(error):
-#     """ Handles Database Errors from connection attempts """
-#     message = error.message or str(error)
-#     app.logger.critical(message)
-#     return {'status':500, 'error': 'Server Error', 'message': message}, 500
-
-
 ######################################################################
 # GET HEALTH CHECK
 ######################################################################
@@ -131,18 +80,6 @@ def request_validation_error(error):
 def healthcheck():
     """ Let them know our heart is still beating """
     return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
-
-
-######################################################################
-# GET INDEX
-######################################################################
-@app.route('/', methods=['GET'])
-def index():
-    """ Root URL response """
-    return make_response(jsonify(name='Payments REST API Service',
-                   doc=url_for('doc', _external=True)
-                  ), status.HTTP_200_OK)
-
 
 
 ######################################################################
@@ -327,7 +264,12 @@ def index1():
 def init_db():
     """ Initialies the SQLAlchemy app """
     # global app
-    Payment.init_db(app)
+    Payment.init_db()
+
+
+def data_reset():
+    """ Removes all Pets from the database """
+    Payment.remove_all()
 
 
 def check_content_type(content_type):
@@ -336,6 +278,7 @@ def check_content_type(content_type):
         return
     app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
+
 
 
 def initialize_logging(log_level=logging.INFO):
