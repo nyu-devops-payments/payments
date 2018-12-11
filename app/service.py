@@ -146,7 +146,7 @@ def index():
 
 
 ######################################################################
-#  PATH: /payments/{id}
+#  PATH: /pets/{id}
 ######################################################################
 @ns.route('/<int:payment_id>')
 @ns.param('payment_id', 'The Payment identifier')

@@ -18,7 +18,6 @@ import logging
 import json
 from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import and_
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
@@ -188,10 +187,10 @@ class Payment(db.Model):
 
 
     @staticmethod
-    def get_default_payment_type(customer_id):
+    def get_default_payment_type():
         """ Returns the default payment method type
         Args:
         default_payment_type(): of all Payments which is set to true
         """
         Payment.logger.info('Processing default_payment_type query for %s ...', default_payment_type)
-        return Payment.query.filter(and_(Payment.default_payment_type.is_(True) , Payment.customer_id == customer_id)).all()
+        return Payment.query.filter(Payment.default_payment_type.is_(True)).all()
