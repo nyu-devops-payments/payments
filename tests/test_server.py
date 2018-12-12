@@ -109,7 +109,7 @@ class TestPaymentServer(unittest.TestCase):
         resp = self.app.post('/payments',
                              data=data,
                              content_type='application/json')
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
