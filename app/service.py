@@ -352,7 +352,7 @@ class PurchaseResource2(Resource):
             raise NotFound("Customer with id '{}' was not found.".format(customer_id))
 
         for p in allpayments:
-            if(p.payment_method_type == default_type)
+            if(p.payment_method_type == default_type):
                 p.set_default()
                 p.save()
             else
