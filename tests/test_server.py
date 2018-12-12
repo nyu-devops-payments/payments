@@ -248,6 +248,14 @@ class TestPaymentServer(unittest.TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_update_payment_bad_request(self):
+        payment = Payment.find_by_order_id('15189')[0];
+        test_payment = dict(customer_id="ABCDE", order_id = 15189, payment_method_type = "PAYPAL", payment_status = "PROCESSING",  default_payment_type = False)
+        data = json.dumps(test_payment)
+        resp = self.app.put('/payments/0',
+                            data=data,
+                            ontent_type='application/json')
+        self.assertEqual(resp.satus_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_payment(self):
         """ Delete a Payment """
