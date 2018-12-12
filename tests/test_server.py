@@ -102,6 +102,16 @@ class TestPaymentServer(unittest.TestCase):
         self.assertEqual(len(data), all_payments_count + 1)
         self.assertIn(new_json, data)
 
+    def test_create_payment_bad_request(self):
+        new_payment = dict(customer_id= "ABCDE", order_id=15190, payment_method_type=PaymentMethodType.DEBIT, payment_status=PaymentStatus.PAID,  default_payment_type=False)
+
+        data = json.dumps(new_payment)
+        resp = self.app.post('/payments',
+                             data=data,
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
 
     def test_query_payment_list_by_customer_id(self):
         """ Query Payments by customer_id """
