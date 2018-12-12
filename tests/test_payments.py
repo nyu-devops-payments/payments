@@ -7,7 +7,7 @@ DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-class TestDefault_type(unitest.TestCase):
+class TestDefault_type(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """ These run once per Test suite """
