@@ -294,13 +294,13 @@ $(function () {
                 }
 
                 var paymentStatus = "PAID";
-                if (payment.payment_status === 3) {
+                if (payment.payment_status === "PaymentStatus.PAID") {
                     paymentStatus = "PAID";
                 }
-                else if (payment.payment_status === 2) {
+                else if (payment.payment_status === "PaymentStatus.PROCESSING") {
                     paymentStatus = "PROCESSING";
                 }
-                else if (payment.payment_status === 1) {
+                else if (payment.payment_status === "PaymentStatus.UNPAID") {
                     paymentStatus = "UNPAID";
                 }
 
@@ -314,7 +314,7 @@ $(function () {
 
             flash_message("Success");
 
-            
+
         });
 
         ajax.fail(function (res) {
