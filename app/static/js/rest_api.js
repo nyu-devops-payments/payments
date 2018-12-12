@@ -249,7 +249,6 @@ $(function () {
 
         ajax.done(function (res) {
             //alert(res.toSource())
-            for(var i = 0; i < res.length; i++) {
 
             var html = '';
             html += '<table class="table-striped pad-10">';
