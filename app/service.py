@@ -293,39 +293,39 @@ class PaymentCollection(Resource):
 #  PATH: /payments/{id}/default/{type}
 # For Deault_payment_type table
 ######################################################################
-# @ns.route('/<int:customer_id>/default_payment_type/<string:deault_type>')
-# @ns.param('customer_id', 'The customer identifier')
-# @ns.param("type", 'The type to be set as default type')
-# class dealut_payment_type_Resource(Resource):
-#         #------------------------------------------------------------------
-#     # RETRIEVE A cistomer's specific payment type
-#     #------------------------------------------------------------------
-#     @ns.doc(default_payment_type_get)
-#     @ns.response(404, 'Customer not found')
-#     @ns.marshal_with(default_type_model)
-#     def get(self, customer_id):
-#         app.logger.info("Request to Retrieve a customer default payment tyoe with customerid [%s]", customer_id)
-#         customer = Deault_type.find_by_customer_id(customer_id)
-#         if not customer:
-#             raise NotFound("Customer with id '{}' was not found".format(customer_id))
+@ns.route('/<int:customer_id>/default_payment_type/<string:deault_type>')
+@ns.param('customer_id', 'The customer identifier')
+@ns.param("type", 'The type to be set as default type')
+class dealut_payment_type_Resource(Resource):
+        #------------------------------------------------------------------
+    # RETRIEVE A cistomer's specific payment type
+    #------------------------------------------------------------------
+    @ns.doc(default_payment_type_get)
+    @ns.response(404, 'Customer not found')
+    @ns.marshal_with(default_type_model)
+    def get(self, customer_id):
+        app.logger.info("Request to Retrieve a customer default payment tyoe with customerid [%s]", customer_id)
+        customer = Deault_type.find_by_customer_id(customer_id)
+        if not customer:
+            raise NotFound("Customer with id '{}' was not found".format(customer_id))
 
-#         return customer.serialize(), status.HTTP_200_OK
+        return customer.serialize(), status.HTTP_200_OK
 
-#         #------------------------------------------------------------------
-#     # PUT A cistomer's specific payment type
-#     #------------------------------------------------------------------
-#     @ns.doc(default_payment_type_put)
-#     @ns.response(404, 'Customer not found')
-#     def put(self, cus, default_type):
-#         app.logger.info('Request to set a payment type as default for customer')
-#         customer = Deault_type.find_by_customer_id(customer_id)
-#         if not customer:
-#             return NotFound("Customer with id '{}' was not found.".format(customer_id))
+        #------------------------------------------------------------------
+    # PUT A cistomer's specific payment type
+    #------------------------------------------------------------------
+    @ns.doc(default_payment_type_put)
+    @ns.response(404, 'Customer not found')
+    def put(self, customer_id, default_type):
+        app.logger.info('Request to set a payment type as default for customer')
+        customer = Deault_type.find_by_customer_id(customer_id)
+        if not customer:
+            return NotFound("Customer with id '{}' was not found.".format(customer_id))
 
-#         customer.dafault_payment_type = default_type
-#         customer.save()
-#         app.logger.info('The default payment method for Customer with id [%s] has been set!', customer_id)
-#         return customer.serialize(), status.HTTP_200_OK
+        customer.dafault_payment_type = default_type
+        customer.save()
+        app.logger.info('The default payment method for Customer with id [%s] has been set!', customer_id)
+        return customer.serialize(), status.HTTP_200_OK
 
     
 

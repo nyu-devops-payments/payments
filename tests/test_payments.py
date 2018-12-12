@@ -1,6 +1,6 @@
 import unittest
 import os
-from app.models import Payment, PaymentMethodType, PaymentStatus, DataValidationError, db, Deault_type
+from app.models import Payment, PaymentMethodType, PaymentStatus, DataValidationError, db, Default_type
 from app import app
 
 DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
@@ -28,6 +28,26 @@ class TestDefault_type(unittest.TestCase):
         db.session.remove()
         db.drop_all()
 
+    def test_create_a_defaultpayment(self):
+        """ Create a payment and assert that it exists """
+        defaultpayment = Deault_type(customer_id=12311, default_payment_type = PaymentMethodType.CREDIT)
+        self.assertTrue(defaultpayment != None)
+        self.assertEqual(payment.id, None)
+        self.assertEqual(payment.customer_id, 12311)
+        self.assertEqual(payment.default_payment_type, PaymentMethodType.CREDIT)
+
+    def test_add_a_defaultpayment(self):
+        """ Create a payment and add it to database """
+        customers = Default_type.all()
+        self.assertEqual(payments, [])
+        defaultpayment = Deault_type(customer_id=12311, default_payment_type = PaymentMethodType.CREDIT)
+        self.assertTrue(defaultpayment != None)
+        self.assertEqual(defaultpayment.id, None)
+        defaultpayment.save()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(defaultpayment.id, 1)
+        customers = Default_type.all()
+
 class TestPayments(unittest.TestCase):
     """ Test Cases for Payments API """
 
@@ -51,26 +71,17 @@ class TestPayments(unittest.TestCase):
         db.session.remove()
         db.drop_all()
 
-    def test_create_a_defaultpayment(self):
+
+    def test_create_a_payment(self):
         """ Create a payment and assert that it exists """
-        defaultpayment = Deault_type(customer_id=12311, default_payment_type = PaymentMethodType.CREDIT)
-        self.assertTrue(defaultpayment != None)
+        payment = Payment(customer_id=12311, order_id = 11151, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = False)
+        self.assertTrue(payment != None)
         self.assertEqual(payment.id, None)
         self.assertEqual(payment.customer_id, 12311)
-        self.assertEqual(payment.default_payment_type, PaymentMethodType.CREDIT)
-
-    def test_add_a_defaultpayment(self):
-        """ Create a payment and add it to database """
-        customers = Default_type.all()
-        self.assertEqual(payments, [])
-        defaultpayment = Deault_type(customer_id=12311, default_payment_type = PaymentMethodType.CREDIT)
-        self.assertTrue(defaultpayment != None)
-        self.assertEqual(defaultpayment.id, None)
-        defaultpayment.save()
-        # Assert that it was assigned an id and shows up in the database
-        self.assertEqual(defaultpayment.id, 1)
-        customers = Default_type.all()
-        
+        self.assertEqual(payment.order_id, 11151)
+        self.assertEqual(payment.payment_method_type, PaymentMethodType.CREDIT)
+        self.assertEqual(payment.payment_status, PaymentStatus.PAID)
+        self.assertEqual(payment.default_payment_type, False)
 
 
     def test_add_a_payment(self):
