@@ -48,7 +48,7 @@ api = Api(app,
           version='1.0.0',
           title='Payment REST API Service',
           description='This is the payments server.',
-          doc='/api'
+          doc='/apidocs'
           # prefix='/api'
          )
 
