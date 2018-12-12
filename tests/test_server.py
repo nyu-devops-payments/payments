@@ -265,6 +265,10 @@ class TestPaymentServer(unittest.TestCase):
         resp = self.app.delete("/payments/reset")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_healthcheck(self):
+        resp = self.app("/healthcheck")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
 ######################################################################
 # Utility functions
 ######################################################################
