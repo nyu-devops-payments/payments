@@ -305,7 +305,7 @@ class dealut_payment_type_Resource(Resource):
     @ns.marshal_with(default_type_model)
     def get(self, customer_id):
         app.logger.info("Request to Retrieve a customer default payment tyoe with customerid [%s]", customer_id)
-        customer = Deault_payment_type.find_by_customer_id(customer_id):
+        customer = Deault_type.find_by_customer_id(customer_id):
         if not customer:
             raise NotFound("Customer with id '{}' was not found".format(customer_id))
 
@@ -318,7 +318,7 @@ class dealut_payment_type_Resource(Resource):
     @ns.response(404, 'Customer not found')
     def put(self, cus, default_type):
         app.logger.info('Request to set a payment type as default for customer')
-        customer = Deault_payment_type.find_by_customer_id(customer_id)
+        customer = Deault_type.find_by_customer_id(customer_id)
         if not customer:
             return NotFound("Customer with id '{}' was not found.".format(customer_id))
 
