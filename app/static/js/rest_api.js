@@ -9,8 +9,33 @@ $(function () {
         $("#payment_id").val(res.id);
         $("#payment_customer_id").val(res.customer_id);
         $("#payment_order_id").val(res.order_id);
-        $("#payment_payment_method_type").val(res.payment_method_type);
-        $("#payment_payment_status").val(res.payment_status);
+        $("#payment_payment_method_type").val("HEYYY");
+
+        if (res.payment_method_type == "PaymentMethodType.DEBIT") {
+            $("#payment_payment_method_type").val("DEBIT");
+        }
+
+        else if (res.payment_method_type == "PaymentMethodType.CREDIT") {
+            $("#payment_payment_method_type").val("CREDIT");
+        }
+
+        else if (res.payment_method_type == "PaymentMethodType.PAYPAL") {
+            $("#payment_payment_method_type").val("PAYPAL");
+        }
+
+        if (res.payment_status == "PaymentStatus.PAID") {
+            $("#payment_payment_status").val("PAID");
+        }
+
+        else if (res.payment_status == "PaymentStatus.PROCESSING") {
+            $("#payment_payment_status").val("PROCESSING");
+        }
+
+        else if (res.payment_status == "PaymentStatus.UNPAID") {
+            $("#payment_payment_status").val("UNPAID");
+        }
+
+        // $("#payment_payment_status").val(res.payment_status);
         if (res.default_payment_type == true) {
             $("#payment_default_payment_type").val("true");
         } else {
@@ -51,7 +76,7 @@ $(function () {
           "id" : id,
           "customer_id" : customer_id,
           "order_id" : order_id,
-          "payment_method_type" : payment_method_type,
+          "payment_method_type" : "DEBIT",
           "payment_status" : payment_status,
           "default_payment_type" : default_payment_type
         };
@@ -65,7 +90,7 @@ $(function () {
 
         ajax.done(function(res){
             update_form_data(res)
-            flash_message("Success")
+            flash_message("Success - Payment Added!")
         });
 
         ajax.fail(function(res){
@@ -132,7 +157,7 @@ $(function () {
         ajax.done(function(res){
             //alert(res.toSource())
             update_form_data(res)
-            flash_message("Success")
+            flash_message("Success!!")
         });
 
         ajax.fail(function(res){
@@ -191,6 +216,10 @@ $(function () {
 
         var queryString = ""
 
+
+        if (id) {
+            queryString += 'id=' + id
+        }
         if (customer_id) {
             queryString += 'customer_id=' + customer_id
         }
