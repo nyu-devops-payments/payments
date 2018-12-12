@@ -12,8 +12,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
 WAIT_SECONDS = 60
-BASE_URL = getenv('BASE_URL', 'http://localhost:5000')
-
+# BASE_URL = getenv('BASE_URL', 'http://localhost:5000')
+BASE_URL = os.getenv('BASE_URL', 'https://nyu-payment-service-f18.mybluemix.net/')
 
 @given('the following payments')
 def step_impl(context):
