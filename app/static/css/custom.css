@@ -1,0 +1,7 @@
+table.pad-10 {
+    font-size: 15px;
+}
+
+    table.pad-10 td, table.pad-10 th {
+        padding: 10px;
+    }
