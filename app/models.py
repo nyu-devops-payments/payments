@@ -196,7 +196,7 @@ class Payment(db.Model):
         Payment.logger.info('Processing default_payment_type query for %s ...', default_payment_type)
         return Payment.query.filter(Payment.default_payment_type.is_(True)).all()
 
-class Deault_type(db.Model)
+class Deault_type(db.Model):
     """
     it's used to save the deault payment type for each customer
     """
