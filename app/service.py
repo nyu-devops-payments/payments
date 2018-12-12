@@ -355,7 +355,7 @@ class PurchaseResource2(Resource):
             if(p.payment_method_type == default_type):
                 p.set_default()
                 p.save()
-            else
+            else:
                 p.unset_default()
                 p.save()
         
