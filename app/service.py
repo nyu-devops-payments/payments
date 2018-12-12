@@ -23,7 +23,7 @@ from werkzeug.exceptions import NotFound
 
 # We use SQLAlchemy that supports SQLite, MySQL and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from models import Payment, PaymentMethodType, PaymentStatus, DataValidationError
+from models import Payment, PaymentMethodType, PaymentStatus, DataValidationError, Deault_type
 
 
 # Import Flask application
