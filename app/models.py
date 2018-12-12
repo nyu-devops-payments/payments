@@ -118,8 +118,9 @@ class Payment(db.Model):
     @staticmethod
     def remove_all():
         """ Removes all Payments from the database """
-        db.drop_all()    # clean up the last tests
-        db.create_all()  # create new tables
+        Payment.query.delete()
+        # db.drop_all()    # clean up the last tests
+        # db.create_all()  # create new tables
 
     @staticmethod
     def all():

@@ -48,7 +48,7 @@ api = Api(app,
           version='1.0.0',
           title='Payment REST API Service',
           description='This is the payments server.',
-          doc='/'
+          doc='/api'
           # prefix='/api'
          )
 
@@ -248,6 +248,14 @@ class PurchaseResource(Resource):
         app.logger.info('Payment with id [%s] has been set as default!', payment.id)
         return payment.serialize(), status.HTTP_200_OK
 
+######################################################################
+# DELETE ALL PET DATA (for testing only)
+######################################################################
+@app.route('/payments/reset', methods=['DELETE'])
+def payments_reset():
+    """ Removes all payments from the database """
+    Payment.remove_all()
+    return make_response('', status.HTTP_204_NO_CONTENT)
 
 ######################################################################
 #   INTERNAL SERVER ERROR
@@ -268,7 +276,7 @@ def init_db():
 
 
 def data_reset():
-    """ Removes all Pets from the database """
+    """ Removes all Payments from the database """
     Payment.remove_all()
 
 
@@ -278,7 +286,6 @@ def check_content_type(content_type):
         return
     app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
-
 
 
 def initialize_logging(log_level=logging.INFO):
