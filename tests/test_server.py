@@ -261,7 +261,18 @@ class TestPaymentServer(unittest.TestCase):
         new_count = self.get_all_payments_count()
         self.assertEqual(new_count, payments_count - 1)
 
+    def test_payments_reset(self):
+        resp = self.app.delete("/payments/reset")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_health(self):
+        """ Test the server health checker """
+        resp = self.app.get('/health')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = json.loads(resp.data)
+        self.assertEqual(data['name'], 'Payments REST API Service - Health')
+        self.assertEqual(data['status'], 'OK')
+        self.assertEqual(data['url'].split('/')[3], 'health')
 
 ######################################################################
 # Utility functions
@@ -310,7 +321,8 @@ class TestPaymentServer(unittest.TestCase):
         print(contentTyp)
         self.assertTrue(contentTyp != None)
 
-    # 
+
+    #
     # def test_internal_server_error(self):
     #     """ Test an Internal Server error """
     #     resp = self.app.get('/test-error')
