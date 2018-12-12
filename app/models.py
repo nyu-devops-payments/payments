@@ -188,5 +188,4 @@ class Payment(db.Model):
         Args:
         default_payment_type(): of all Payments which is set to true
         """
-        Payment.logger.info('Processing default_payment_type query for %s ...', default_payment_type)
         return Payment.query.filter(Payment.default_payment_type.is_(True)).all()
