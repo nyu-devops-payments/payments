@@ -19,12 +19,11 @@ import make_enum_json_serializable  # ADDED
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from flask_restplus import Api, Resource, fields
-from werkzeug.exceptions import NotFound, BadRequest
+from werkzeug.exceptions import NotFound
 
 # We use SQLAlchemy that supports SQLite, MySQL and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
 from models import Payment, PaymentMethodType, PaymentStatus, db
-from app.custom_exceptions import DataValidationError
 # Import Flask application
 from . import app
 # Error handlers reuire app to be initialized so we must import
@@ -74,7 +73,6 @@ payment_model = api.model('Payment', {
 
 })
 
-
 ######################################################################
 # GET HEALTH CHECK
 ######################################################################
@@ -85,7 +83,7 @@ def healthcheck():
 
 
 ######################################################################
-#  PATH: /payments/{id}
+#  PATH: /pets/{id}
 ######################################################################
 @ns.route('/<int:payment_id>')
 @ns.param('payment_id', 'The Payment identifier')
@@ -139,10 +137,7 @@ class PaymentResource(Resource):
         app.logger.info(data)
         payment.deserialize(data)
         payment.id = payment_id
-        try:
-            payment.save()
-        except:
-            raise BadRequest('The posted data was not valid')
+        payment.save()
         return payment.serialize(), status.HTTP_200_OK
 
     #------------------------------------------------------------------
@@ -205,8 +200,8 @@ class PaymentCollection(Resource):
     @ns.doc('create_payments')
     @ns.expect(payment_model)
     @ns.response(400, 'The posted data was not valid')
-    @ns.response(201, 'Payment created successfully')
-    #@ns.marshal_with(payment_model, code=201)
+    @ns.response(201, 'Pet created successfully')
+    @ns.marshal_with(payment_model, code=201)
     def post(self):
         """
         Creates a Payment
@@ -217,10 +212,7 @@ class PaymentCollection(Resource):
         payment = Payment()
         app.logger.info('Payload = %s', api.payload)
         payment.deserialize(api.payload)
-        try:
-            payment.save()
-        except:
-            raise BadRequest('The posted data was not valid')
+        payment.save()
         app.logger.info('Payment with new id [%s] saved!', payment.id)
         location_url = api.url_for(PaymentResource, payment_id=payment.id, _external=True)
         return payment.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
@@ -276,7 +268,7 @@ def init_db():
 
 
 def data_reset():
-    """ Removes all Payments from the database """
+    """ Removes all Pets from the database """
     Payment.remove_all()
 
 

@@ -1,19 +1,18 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Payments REST API Service</title>
+  <head>
+    <title>Pet Demo RESTful Service</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="static/css/blue_bootstrap.min.css">
-    <link rel="stylesheet" href="static/css/custom.css">
-    <script type="text/javascript" src="static/js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src = "static/js/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" src="static/js/rest_api.js"></script>
-</head>
+  </head>
   <body>
     <div class="container">
         <div class="page-header">
-            <h1>Payments REST API Service</h1>
+            <h1>Pet Demo REST API Service</h1>
         </div>
 
         <!-- Flash Message -->
@@ -24,13 +23,13 @@
         </div>
 
         <div class="col-md-12" id="form_data">
-          Create, Retrieve, Update, and Delete a Payment:
+          Create, Retrieve, Update, and Delete a Pet:
           <div class="well">
             <div class="form-horizontal">
               <div class="form-group">
-                <label class="control-label col-sm-2" for="payment_id">Payment ID:</label>
+                <label class="control-label col-sm-2" for="pet_id">Pet ID:</label>
                 <div class="col-sm-6">
-                  <input type="text" class="form-control" id="payment_id" placeholder="Enter ID of Payment">
+                  <input type="text" class="form-control" id="pet_id" placeholder="Enter ID of Pet">
                 </div>
                 <div class="col-sm-4">
                   <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve</button>
@@ -41,39 +40,26 @@
 
             <div class="form-horizontal">
               <div class="form-group">
-                <label class="control-label col-sm-2" for="payment_customer_id">Customer ID:</label>
+                <label class="control-label col-sm-2" for="pet_name">Name:</label>
                 <div class="col-sm-10">
-                  <input type="text" class="form-control" id="payment_customer_id" placeholder="Enter customer id for Payment">
+                  <input type="text" class="form-control" id="pet_name" placeholder="Enter name for Pet">
                 </div>
               </div>
               <div class="form-group">
-                <label class="control-label col-sm-2" for="payment_order_id">Order ID:</label>
+                <label class="control-label col-sm-2" for="pet_category">Category:</label>
                 <div class="col-sm-10">
-                  <input type="text" class="form-control" id="payment_order_id" placeholder="Enter order id for Payment">
+                  <input type="text" class="form-control" id="pet_category" placeholder="Enter category for Pet">
                 </div>
               </div>
               <div class="form-group">
-                <label class="control-label col-sm-2" for="payment_payment_method_type">Payment Method Type:</label>
+                <label class="control-label col-sm-2" for="pet_available">Available:</label>
                 <div class="col-sm-10">
-                  <input type="text" class="form-control" id="payment_payment_method_type" placeholder="Enter payment method type for Payment">
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="control-label col-sm-2" for="payment_payment_status">Payment Status:</label>
-                <div class="col-sm-10">
-                  <input type="text" class="form-control" id="payment_payment_status" placeholder="Enter payment status for Payment">
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="control-label col-sm-2" for="payment_default_payment_type">Default Payment Type:</label>
-                <div class="col-sm-10">
-                  <select class="form-control" id="payment_default_payment_type">
+                  <select class="form-control" id="pet_available">
                       <option value="true" selected>True</option>
                       <option value="false">False</option>
                   </select>
                 </div>
               </div>
-
               <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
                   <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
@@ -87,15 +73,13 @@
 
         <!-- Search Results -->
         <div class="table-responsive col-md-12" id="search_results">
-          <table class="table-striped pad-10">
+          <table class="table-striped">
             <thead>
             <tr>
                 <th class="col-md-1">ID</th>
-                <th class="col-md-4">Customer ID</th>
-                <th class="col-md-4">Order ID</th>
-                <th class="col-md-4">Payment Method Type</th>
-                <th class="col-md-4">Payment Status</th>
-                <th class="col-md-4">Default Payment Type</th>
+                <th class="col-md-4">Name</th>
+                <th class="col-md-4">Category</th>
+                <th class="col-md-3">Available</th>
             </tr>
             </thead>
           </table>
@@ -103,7 +87,7 @@
 
         <footer>
           <br><br>
-          <p>&copy; NYU DevOps Company 2018</p>
+          <p>&copy; NYU DevOps Company 2017</p>
         </footer>
         </div><!--/span-->
      </div><!--/row-->
