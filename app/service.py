@@ -48,7 +48,7 @@ api = Api(app,
           version='1.0.0',
           title='Payment REST API Service',
           description='This is the payments server.',
-          doc='/'
+          doc='/api'
           # prefix='/api'
          )
 
@@ -248,14 +248,37 @@ class PurchaseResource(Resource):
         app.logger.info('Payment with id [%s] has been set as default!', payment.id)
         return payment.serialize(), status.HTTP_200_OK
 
+######################################################################
+# DELETE ALL PAYMENT DATA (for testing only)
+######################################################################
+@app.route('/payments/reset', methods=['DELETE'])
+def payments_reset():
+    """ Removes all payments from the database """
+    Payment.remove_all()
+    return make_response('', status.HTTP_204_NO_CONTENT)
 
 ######################################################################
 #   INTERNAL SERVER ERROR
 ######################################################################
-@app.route('/test-error')
-def index1():
-    raise InternalServerError("Can't Initiate Request")
-
+# @app.route('/test-error')
+# def index1():
+#     error_handlers.internal_server_error(DataValidationError)
+#
+# @app.route('/test-bad-request-error')
+# def index4():
+#     error_handlers.bad_request(DataValidationError)
+#
+# @app.route('/test-not-found-error')
+# def index5():
+#     error_handlers.not_found(DataValidationError)
+#
+# @app.route('/test-method-not-supported-error')
+# def index6():
+#     error_handlers.method_not_supported(DataValidationError)
+#
+# @app.route('/test-mediatype-not-supported-error')
+# def index7():
+#     error_handlers.mediatype_not_supported(DataValidationError)
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -278,7 +301,6 @@ def check_content_type(content_type):
         return
     app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
-
 
 
 def initialize_logging(log_level=logging.INFO):

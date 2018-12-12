@@ -245,6 +245,7 @@ class TestPaymentServer(unittest.TestCase):
         resp = self.app.put('/payments/0',
                             data=data,
                             content_type='application/json')
+
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -283,7 +284,6 @@ class TestPaymentServer(unittest.TestCase):
         resp = self.app.get('/payments', query_string='customer_id=111x50')
         #self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-
     @patch('app.service.Payment.find_by_order_id')
     def test_mock_search_data(self, payment_find_mock):
         """ Test showing how to mock data """
@@ -291,10 +291,10 @@ class TestPaymentServer(unittest.TestCase):
         resp = self.app.get('/payments', query_string='order_id=01')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+
     def test_method_not_allowed(self):
         resp = self.app.put('/payments')
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-        #self.assertRaises(error_handlers.method_not_supported(DataValidationError))
 
 
     def test_check_content_type(self):
@@ -304,19 +304,42 @@ class TestPaymentServer(unittest.TestCase):
                              data=data,
                              content_type='application/json1')
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-        #self.assertEqual(error_handlers.mediatype_not_supported(DataValidationError).status, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
         # Make sure it is an invalid content Type
         contentTyp = resp.headers.get('Content-Type', None)
         print(contentTyp)
         self.assertTrue(contentTyp != None)
 
-
-    def test_internal_server_error(self):
-        """ Test an Internal Server error """
-        resp = self.app.get('/test-error')
-        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    # 
+    # def test_internal_server_error(self):
+    #     """ Test an Internal Server error """
+    #     resp = self.app.get('/test-error')
+    #     self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #
+    #
+    # def test_bad_request_error(self):
+    #     """ Test an Request Valid error """
+    #     resp = self.app.get('/test-bad-request-error')
+    #     self.assertEqual(resp, status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #
+    #
+    # def test_not_found_error(self):
+    #     """ Test an Request Valid error """
+    #     resp = self.app.get('/test-not-found-error')
+    #     self.assertEqual(resp, status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #
+    #
+    # def test_method_not_supported_error(self):
+    #     """ Test an Method Not supported error """
+    #     resp = self.app.get('/test-method-not-supported-error')
+    #     self.assertEqual(resp, status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #
+    #
+    # def test_media_type_not_supported_error(self):
+    #     """ Test Media Type Not supported error """
+    #     resp = self.app.get('/test-media-type-not-supported-error')
+    #     self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    #
 
 
 ######################################################################

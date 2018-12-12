@@ -10,27 +10,28 @@ Vagrant.configure(2) do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "ubuntu/xenial64"
   # set up network ip and port forwarding
-  config.vm.network "forwarded_port", guest: 5000, host: 5044, host_ip: "127.0.0.1"
+
+  config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
   config.vm.network "private_network", ip: "192.168.33.10"
 
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
-    vb.memory = "256"
+    vb.memory = "512"
     vb.cpus = 1
     # Fixes some DNS issues on some networks
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
   end
 
-    # Provider-specific configuration
-    config.vm.provider "virtualbox" do |vb|
-      # Customize the amount of memory on the VM:
-      vb.memory = "1024"
-      vb.cpus = 1
-      # Fixes some DNS issues on some networks
-      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-      vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-    end
+    # # Provider-specific configuration
+    # config.vm.provider "virtualbox" do |vb|
+    #   # Customize the amount of memory on the VM:
+    #   vb.memory = "1024"
+    #   vb.cpus = 1
+    #   # Fixes some DNS issues on some networks
+    #   vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    #   vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    # end
 
     # Copy your .gitconfig file so that your git credentials are correct
     if File.exists?(File.expand_path("~/.gitconfig"))
