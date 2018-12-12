@@ -240,7 +240,7 @@ class Deault_type(db.Model):
     @staticmethod
     def init_db():
         """ Initializes the database session """
-        Payment.logger.info('Initializing database')
+        Default_type.logger.info('Initializing database')
         db.create_all()
 
     @staticmethod
