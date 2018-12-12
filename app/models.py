@@ -118,9 +118,8 @@ class Payment(db.Model):
     @staticmethod
     def remove_all():
         """ Removes all Payments from the database """
-        Payment.query.delete()
-        # db.drop_all()    # clean up the last tests
-        # db.create_all()  # create new tables
+        db.drop_all()    # clean up the last tests
+        db.create_all()  # create new tables
 
     @staticmethod
     def all():
@@ -189,5 +188,4 @@ class Payment(db.Model):
         Args:
         default_payment_type(): of all Payments which is set to true
         """
-        Payment.logger.info('Processing default_payment_type query for %s ...', default_payment_type)
         return Payment.query.filter(Payment.default_payment_type.is_(True)).all()

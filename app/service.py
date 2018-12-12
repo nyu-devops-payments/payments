@@ -249,7 +249,7 @@ class PurchaseResource(Resource):
         return payment.serialize(), status.HTTP_200_OK
 
 ######################################################################
-# DELETE ALL PET DATA (for testing only)
+# DELETE ALL PAYMENT DATA (for testing only)
 ######################################################################
 @app.route('/payments/reset', methods=['DELETE'])
 def payments_reset():
@@ -260,10 +260,25 @@ def payments_reset():
 ######################################################################
 #   INTERNAL SERVER ERROR
 ######################################################################
-@app.route('/test-error')
-def index1():
-    raise InternalServerError("Can't Initiate Request")
-
+# @app.route('/test-error')
+# def index1():
+#     error_handlers.internal_server_error(DataValidationError)
+#
+# @app.route('/test-bad-request-error')
+# def index4():
+#     error_handlers.bad_request(DataValidationError)
+#
+# @app.route('/test-not-found-error')
+# def index5():
+#     error_handlers.not_found(DataValidationError)
+#
+# @app.route('/test-method-not-supported-error')
+# def index6():
+#     error_handlers.method_not_supported(DataValidationError)
+#
+# @app.route('/test-mediatype-not-supported-error')
+# def index7():
+#     error_handlers.mediatype_not_supported(DataValidationError)
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
