@@ -310,6 +310,9 @@ class TestPaymentServer(unittest.TestCase):
         print(contentTyp)
         self.assertTrue(contentTyp != None)
 
+    def test_payments_reset():
+        resp = self.app.delete('/payments/reset')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
     # 
     # def test_internal_server_error(self):
     #     """ Test an Internal Server error """
