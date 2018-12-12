@@ -266,48 +266,55 @@ $(function () {
         }
 
         ajax.done(function (res) {
-            //alert(res.toSource())
-            $("#search_results").empty();
-            $("#search_results").append('<table class="table-striped">');
-            var header = '<tr>'
-            header += '<th style="width:10%">ID</th>'
-            header += '<th style="width:10%">Customer ID</th>'
-            header += '<th style="width:10%">Order ID</th>'
-            header += '<th style="width:20%">Payment Method Type</th>'
-            header += '<th style="width:20%">Payment Status</th>'
-            header += '<th style="width:10%">Default Payment Type</th>'
 
-            $("#search_results").append(header);
+
+            var html = '';
+            html += '<table class="table-striped pad-10">';
+            html += '<tr>';
+            html += '<th style="width:10%">ID</th>';
+            html += '<th style="width:40%">Customer ID</th>';
+            html += '<th style="width:40%">Order ID</th>';
+            html += '<th style="width:10%">Payment Method Type</th>';
+            html += '<th style="width:10%">Payment Status</th>';
+            html += '<th style="width:10%">Default Payment Type</th>';
+            html += '</tr>';
+
             for (var i = 0; i < res.length; i++) {
                 payment = res[i];
+
                 var paymentMethodType = "DEBIT";
-                if (payment.payment_method_type == "PaymentMethodType.DEBIT") {
+                if (payment.payment_method_type === "PaymentMethodType.DEBIT") {
                     paymentMethodType = "DEBIT";
                 }
-                else if (payment.payment_method_type == "PaymentMethodType.CREDIT") {
+                else if (payment.payment_method_type === "PaymentMethodType.CREDIT") {
                     paymentMethodType = "CREDIT";
                 }
-                else if (payment.payment_method_type == "PaymentMethodType.PAYPAL") {
+                else if (payment.payment_method_type === "PaymentMethodType.PAYPAL") {
                     paymentMethodType = "PAYPAL";
                 }
 
                 var paymentStatus = "PAID";
-                if (payment.payment_status == 3) {
+                if (payment.payment_status === 3) {
                     paymentStatus = "PAID";
                 }
-                else if (payment.payment_status == 2) {
+                else if (payment.payment_status === 2) {
                     paymentStatus = "PROCESSING";
                 }
-                else if (payment.payment_status == 1) {
+                else if (payment.payment_status === 1) {
                     paymentStatus = "UNPAID";
                 }
 
-                var row = "<tr><td>" + payment.id + "</td><td>" + payment.customer_id + "</td><td>" + payment.order_id + "</td><td>" + paymentMethodType + "</td></tr>" + "<tr><td>" + paymentStatus + "</td><td>" + "<tr><td>" + payment.default_payment_type + "</td><td>";
-                $("#search_results").append(row);
+                html += "<tr><td>" + payment.id + "</td><td>" + payment.customer_id + "</td><td>" + payment.order_id + "</td><td>" + paymentMethodType + "</td><td>" + paymentStatus + "</td><td>" + payment.default_payment_type + "</td></tr>";
             }
 
-            $("#search_results").append('</table>');
-            flash_message("Success!!3")
+            html += '</table>';
+
+            $("#search_results").empty();
+            $("#search_results").append(html);
+
+            flash_message("Success");
+
+            
         });
 
         ajax.fail(function (res) {
