@@ -83,7 +83,7 @@ def healthcheck():
 
 
 ######################################################################
-#  PATH: /pets/{id}
+#  PATH: /payments/{id}
 ######################################################################
 @ns.route('/<int:payment_id>')
 @ns.param('payment_id', 'The Payment identifier')
@@ -200,7 +200,7 @@ class PaymentCollection(Resource):
     @ns.doc('create_payments')
     @ns.expect(payment_model)
     @ns.response(400, 'The posted data was not valid')
-    @ns.response(201, 'Pet created successfully')
+    @ns.response(201, 'Payment created successfully')
     @ns.marshal_with(payment_model, code=201)
     def post(self):
         """
@@ -268,7 +268,7 @@ def init_db():
 
 
 def data_reset():
-    """ Removes all Pets from the database """
+    """ Removes all Payments from the database """
     Payment.remove_all()
 
 
