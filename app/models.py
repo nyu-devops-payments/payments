@@ -39,6 +39,80 @@ class PaymentMethodType(Enum):
    DEBIT = 2
    PAYPAL = 3
 
+class Deault_type(db.Model)
+    """
+    it's used to save the deault payment type for each customer
+    """
+    logger = logger.getLogger(__name__)
+    app = None
+
+    #Table Schema
+    id = db.Column(db.Integer, primary_key = True)
+    customer_id = db.Column(db.Integer, nullable = False)
+    default_payment_type = db.Column(db.Enum(PaymentMethodType), nullable = False)
+
+    def save(self):
+
+        if not self.id:
+            db.session.add(self)
+        db.sesskln.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def serialize(self):
+        
+        return{"id":self.id,
+                "customer_id":self.customer_id,
+                "default_payment_type":self.default_payment_type
+                }
+
+    def deseralize(self, data):
+        try:
+            self.customer_id = data['customer_id']
+            self.default_payment_type = daya['default_payment_type']
+
+        except KeyError as error:
+            raise DataValidationError('Invalid Payment Data: missing ' + error.args[0])
+        except TyoeError as error:
+            raise DataValidationError('Invalid Payment Data: body of request contained' \
+                                      'bad or no data')
+        return self
+
+    @staticmethod
+    def init_db():
+        """ Initializes the database session """
+        Payment.logger.info('Initializing database')
+        db.create_all()
+
+    @staticmethod
+    def remove_all():
+        """ Removes all Payments from the database """
+        db.drop_all()    # clean up the last tests
+        db.create_all()  # create new tables
+
+    @staticmethod
+    def find(Deault_type_id):
+        Deault_type.logger.info('Processing lookup for Deault_type_id %s ...', Default_type_id)
+        return Deault_type.query.get(id)
+
+    @staticmethod
+    def find_or_404(Deault_type_id):
+        Deault_type.logger.info('Processing lookup or 404 for Deault_type %s ...', Default_type_id)
+        return Default_type.query.get_or_404(payment_id)
+
+    @staticmethod
+    def find_by_customer_id(customer_id):
+        Deault_type.logger.info('Processing customer default payment type query for %s ...', customer_id)
+        return Deault_type.query.filter(Payment.customer_id == customer_id).all()
+
+    
+
+
+
+
+
 class Payment(db.Model):
     """
     Class that represents a Payment
