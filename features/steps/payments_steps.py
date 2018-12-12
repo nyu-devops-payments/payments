@@ -43,8 +43,6 @@ def step_impl(context):
 @then('I should see "{message}" in the title')
 def step_impl(context,message):
     """ Check the document title for a message """
-    print("context.driver.title")
-    print(context.driver.title)
     expect(context.driver.title).to_contain(message)
 
 @then('I should not see "{message}"')

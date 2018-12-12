@@ -15,3 +15,13 @@ Scenario: The server is running
     When I visit the "Home Page"
     Then I should see "Payments REST API Service" in the title
     And I should not see "404 Not Found"
+
+Scenario: Create a Payment
+    When I visit the "Home Page"
+    And I set the "customer_id" to 12302
+    And I set the "order_id" to 11121
+    And I set the "payment_method_type" to "DEBIT"
+    And I set the "payment_status" to "PAID"
+    And I set the "default_payment_type" to False
+    And I press the "Create" button
+    Then I should see the message "Success"
