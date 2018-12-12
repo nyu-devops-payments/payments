@@ -265,9 +265,14 @@ class TestPaymentServer(unittest.TestCase):
         resp = self.app.delete("/payments/reset")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_healthcheck(self):
-        resp = self.app("/healthcheck")
+    def test_health(self):
+        """ Test the server health checker """
+        resp = self.app.get('/health')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = json.loads(resp.data)
+        self.assertEqual(data['name'], 'Payments REST API Service - Health')
+        self.assertEqual(data['status'], 'OK')
+        self.assertEqual(data['url'].split('/')[3], 'health')
 
 ######################################################################
 # Utility functions

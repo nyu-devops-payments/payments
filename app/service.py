@@ -74,12 +74,14 @@ payment_model = api.model('Payment', {
 })
 
 ######################################################################
-# GET HEALTH CHECK
+# GET HEALTH
 ######################################################################
-@app.route('/healthcheck')
-def healthcheck():
-    """ Let them know our heart is still beating """
-    return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
+@app.route('/health', methods=['GET'])
+def health():
+    """ Return service health """
+    return jsonify(name='Payments REST API Service - Health',
+                   status='OK',
+                   url=url_for('health', _external=True)),status.HTTP_200_OK
 
 
 ######################################################################
