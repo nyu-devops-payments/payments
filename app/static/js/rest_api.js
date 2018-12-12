@@ -44,12 +44,12 @@ $(function () {
 
     /// Clears all form fields
     function clear_form_data() {
-      $("#payment_id").val("");
-      $("#payment_customer_id").val("");
-      $("#payment_order_id").val("");
-      $("#payment_payment_method_type").val("");
-      $("#payment_payment_status").val("");
-      $("#payment_default_payment_type").val("");
+        $("#payment_id").val("");
+        $("#payment_customer_id").val("");
+        $("#payment_order_id").val("");
+        $("#payment_payment_method_type").val("");
+        $("#payment_payment_status").val("");
+        $("#payment_default_payment_type").val("");
     }
 
     // Updates the flash message area
@@ -77,27 +77,27 @@ $(function () {
         }
 
         var data = {
-          "id" : id,
-          "customer_id" : customer_id,
-          "order_id" : order_id,
-          "payment_method_type" : "DEBIT",
-          "payment_status" : payment_status,
-          "default_payment_type" : default_payment_type
+            "id": id,
+            "customer_id": customer_id,
+            "order_id": order_id,
+            "payment_method_type": "DEBIT",
+            "payment_status": payment_status,
+            "default_payment_type": default_payment_type
         };
 
         var ajax = $.ajax({
             type: "POST",
             url: "/payments",
-            contentType:"application/json",
+            contentType: "application/json",
             data: JSON.stringify(data),
         });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res)
             flash_message("Success - Payment Added!")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
     });
@@ -117,27 +117,27 @@ $(function () {
         var default_payment_type = $("#payment_default_payment_type").val() == "false";
 
         var data = {
-          "id" : id,
-          "customer_id" : customer_id,
-          "order_id" : order_id,
-          "payment_method_type" : payment_method_type,
-          "payment_status" :payment_status,
-          "default_payment_type" : default_payment_type
+            "id": id,
+            "customer_id": customer_id,
+            "order_id": order_id,
+            "payment_method_type": payment_method_type,
+            "payment_status": payment_status,
+            "default_payment_type": default_payment_type
         };
 
         var ajax = $.ajax({
-                type: "PUT",
-                url: "/payments/" + id,
-                contentType:"application/json",
-                data: JSON.stringify(data)
-            })
+            type: "PUT",
+            url: "/payments/" + id,
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res)
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
 
@@ -154,17 +154,17 @@ $(function () {
         var ajax = $.ajax({
             type: "GET",
             url: "/payments/" + id,
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             //alert(res.toSource())
             update_form_data(res)
             flash_message("Success!!")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             clear_form_data()
             flash_message(res.responseJSON.message)
         });
@@ -182,16 +182,16 @@ $(function () {
         var ajax = $.ajax({
             type: "DELETE",
             url: "/payments/" + id,
-            contentType:"application/json",
+            contentType: "application/json",
             data: '',
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             clear_form_data()
-            flash_message("Payment with ID [" +  id + "] has been Deleted!")
+            flash_message("Payment with ID [" + id + "] has been Deleted!")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message("Server error!")
         });
     });
@@ -252,65 +252,72 @@ $(function () {
         var ajax = $.ajax({
             type: "GET",
             url: "/payments" + queryString,
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
         })
 
-        if(queryString){
-          ajax = $.ajax({
-              type: "GET",
-              url: "/payments?" + queryString,
-              contentType:"application/json",
-              data: ''
-          })
+        if (queryString) {
+            ajax = $.ajax({
+                type: "GET",
+                url: "/payments?" + queryString,
+                contentType: "application/json",
+                data: ''
+            })
         }
 
-        ajax.done(function(res){
-            //alert(res.toSource())
-            $("#search_results").empty();
-            $("#search_results").append('<table class="table-striped">');
-            var header = '<tr>'
-            header += '<th style="width:10%">ID</th>'
-            header += '<th style="width:10%">Customer ID</th>'
-            header += '<th style="width:10%">Order ID</th>'
-            header += '<th style="width:20%">Payment Method Type</th>'
-            header += '<th style="width:20%">Payment Status</th>'
-            header += '<th style="width:10%">Default Payment Type</th>'
+        ajax.done(function (res) {
 
-            $("#search_results").append(header);
-            for(var i = 0; i < res.length; i++) {
+
+            var html = '';
+            html += '<table class="table-striped pad-10">';
+            html += '<tr>';
+            html += '<th style="width:10%">ID</th>';
+            html += '<th style="width:40%">Customer ID</th>';
+            html += '<th style="width:40%">Order ID</th>';
+            html += '<th style="width:10%">Payment Method Type</th>';
+            html += '<th style="width:10%">Payment Status</th>';
+            html += '<th style="width:10%">Default Payment Type</th>';
+            html += '</tr>';
+
+            for (var i = 0; i < res.length; i++) {
                 payment = res[i];
+
                 var paymentMethodType = "DEBIT";
-                if (payment.payment_method_type == "PaymentMethodType.DEBIT") {
+                if (payment.payment_method_type === "PaymentMethodType.DEBIT") {
                     paymentMethodType = "DEBIT";
                 }
-                else if (payment.payment_method_type == "PaymentMethodType.CREDIT") {
+                else if (payment.payment_method_type === "PaymentMethodType.CREDIT") {
                     paymentMethodType = "CREDIT";
                 }
-                else if (payment.payment_method_type == "PaymentMethodType.PAYPAL") {
+                else if (payment.payment_method_type === "PaymentMethodType.PAYPAL") {
                     paymentMethodType = "PAYPAL";
                 }
 
                 var paymentStatus = "PAID";
-                if (payment.payment_status == 3) {
+                if (payment.payment_status === 3) {
                     paymentStatus = "PAID";
                 }
-                else if (payment.payment_status == 2) {
+                else if (payment.payment_status === 2) {
                     paymentStatus = "PROCESSING";
                 }
-                else if (payment.payment_status == 1) {
+                else if (payment.payment_status === 1) {
                     paymentStatus = "UNPAID";
                 }
 
-                var row = "<tr><td>"+payment.id+"</td><td>"+payment.customer_id+"</td><td>"+payment.order_id+"</td><td>"+paymentMethodType+"</td></tr>"+"<tr><td>"+paymentStatus+"</td><td>"+"<tr><td>"+payment.default_payment_type+"</td><td>";
-                $("#search_results").append(row);
+                html += "<tr><td>" + payment.id + "</td><td>" + payment.customer_id + "</td><td>" + payment.order_id + "</td><td>" + paymentMethodType + "</td><td>" + paymentStatus + "</td><td>" + payment.default_payment_type + "</td></tr>";
             }
 
-            $("#search_results").append('</table>');
-            flash_message("Success!!3")
+            html += '</table>';
+
+            $("#search_results").empty();
+            $("#search_results").append(html);
+
+            flash_message("Success");
+
+            
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
 

@@ -19,7 +19,7 @@ import make_enum_json_serializable  # ADDED
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from flask_restplus import Api, Resource, fields
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, BadRequest
 
 # We use SQLAlchemy that supports SQLite, MySQL and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
@@ -137,7 +137,10 @@ class PaymentResource(Resource):
         app.logger.info(data)
         payment.deserialize(data)
         payment.id = payment_id
-        payment.save()
+        try:
+            payment.save()
+        except:
+            raise BadRequest('The posted data was not valid')
         return payment.serialize(), status.HTTP_200_OK
 
     #------------------------------------------------------------------
@@ -212,7 +215,10 @@ class PaymentCollection(Resource):
         payment = Payment()
         app.logger.info('Payload = %s', api.payload)
         payment.deserialize(api.payload)
-        payment.save()
+        try:
+            payment.save()
+        except:
+            raise BadRequest('The posted data was not valid')
         app.logger.info('Payment with new id [%s] saved!', payment.id)
         location_url = api.url_for(PaymentResource, payment_id=payment.id, _external=True)
         return payment.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
