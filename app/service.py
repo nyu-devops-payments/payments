@@ -295,7 +295,7 @@ class PaymentCollection(Resource):
 ######################################################################
 @ns.route('/<int:customer_id>/default_payment_type/<string:deault_type>')
 @ns.param('customer_id', 'The customer identifier')
-@ns.parm("type", 'The type to be set as default type')
+@ns.param("type", 'The type to be set as default type')
 class dealut_payment_type_Resource(Resource):
         #------------------------------------------------------------------
     # RETRIEVE A cistomer's specific payment type
