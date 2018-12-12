@@ -200,7 +200,7 @@ class Deault_type(db.Model):
     """
     it's used to save the deault payment type for each customer
     """
-    logger = logger.getLogger(__name__)
+    logger = logging.getLogger(__name__)
     app = None
 
     #Table Schema
