@@ -254,7 +254,7 @@ class TestPaymentServer(unittest.TestCase):
         data = json.dumps(test_payment)
         resp = self.app.put('/payments/0',
                             data=data,
-                            ontent_type='application/json')
+                            content_type='application/json')
         self.assertEqual(resp.satus_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_payment(self):
