@@ -102,16 +102,6 @@ class TestPaymentServer(unittest.TestCase):
         self.assertEqual(len(data), all_payments_count + 1)
         self.assertIn(new_json, data)
 
-    def test_create_payment_bad_request(self):
-        new_payment = dict(customer_id= "ABCDE", order_id=15190, payment_method_type=PaymentMethodType.DEBIT, payment_status=PaymentStatus.PAID,  default_payment_type=False)
-
-        data = json.dumps(new_payment)
-        resp = self.app.post('/payments',
-                             data=data,
-                             content_type='application/json')
-        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 
     def test_query_payment_list_by_customer_id(self):
         """ Query Payments by customer_id """
@@ -262,10 +252,10 @@ class TestPaymentServer(unittest.TestCase):
         payment = Payment.find_by_order_id('15189')[0];
         test_payment = dict(customer_id="ABCDE", order_id = 15189, payment_method_type = "PAYPAL", payment_status = "PROCESSING",  default_payment_type = False)
         data = json.dumps(test_payment)
-        resp = self.app.put('/payments/0',
+        resp = self.app.put('/payments/payment.id',
                             data=data,
                             content_type='application/json')
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_payment(self):
         """ Delete a Payment """
