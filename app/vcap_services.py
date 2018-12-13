@@ -33,11 +33,11 @@ def get_database_uri():
     database_uri = None
     if 'DATABASE_URI' in os.environ:
         # Get the credentials from DATABASE_URI
-        current_app.logger.info("Using DATABASE_URI...")
+        # current_app.logger.info("Using DATABASE_URI...")
         database_uri = os.environ['DATABASE_URI']
     elif 'VCAP_SERVICES' in os.environ:
         # Get the credentials from the Bluemix environment
-        current_app.logger.info("Using VCAP_SERVICES...")
+        # current_app.logger.info("Using VCAP_SERVICES...")
         vcap_services = os.environ['VCAP_SERVICES']
         services = json.loads(vcap_services)
         creds = services['dashDB For Transactions'][0]['credentials']
