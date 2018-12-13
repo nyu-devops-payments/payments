@@ -283,24 +283,24 @@ $(function () {
                 payment = res[i];
 
                 var paymentMethodType = "DEBIT";
-                if (payment.payment_method_type === "PaymentMethodType.DEBIT") {
+                if (payment.payment_method_type == "PaymentMethodType.DEBIT") {
                     paymentMethodType = "DEBIT";
                 }
-                else if (payment.payment_method_type === "PaymentMethodType.CREDIT") {
+                else if (payment.payment_method_type == "PaymentMethodType.CREDIT") {
                     paymentMethodType = "CREDIT";
                 }
-                else if (payment.payment_method_type === "PaymentMethodType.PAYPAL") {
+                else if (payment.payment_method_type == "PaymentMethodType.PAYPAL") {
                     paymentMethodType = "PAYPAL";
                 }
 
                 var paymentStatus = "PAID";
-                if (payment.payment_status === 3) {
+                if (payment.payment_status == 3) {
                     paymentStatus = "PAID";
                 }
-                else if (payment.payment_status === 2) {
+                else if (payment.payment_status == 2) {
                     paymentStatus = "PROCESSING";
                 }
-                else if (payment.payment_status === 1) {
+                else if (payment.payment_status == 1) {
                     paymentStatus = "UNPAID";
                 }
 
@@ -323,5 +323,30 @@ $(function () {
 
     });
 
-    
+    // ****************************************
+    // Set as Default Payment Resource (Action)
+    // ****************************************
+
+    $("#action-btn").click(function () {
+
+        var id = $("#payment_id").val();
+
+        var ajax = $.ajax({
+            type: "PUT",
+            url: "/payments/" + id + "/default",
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function (res) {
+            clear_form_data()
+            flash_message("Payment with ID [" + id + "] has been set as Default Payment Resource!")
+        });
+
+        ajax.fail(function (res) {
+            flash_message(res.responseJSON.message)
+        });
+
+    }
+
 })
