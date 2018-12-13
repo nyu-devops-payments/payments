@@ -186,6 +186,15 @@ class TestPayments(unittest.TestCase):
         payment = Payment()
         self.assertRaises(DataValidationError, payment.deserialize, data)
 
+    def test_get_deault_payment_type(self):
+        payment1 = Payment(customer_id=12310, order_id = 13159, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
+        payment1.save()
+        payment2 = Payment(customer_id=12310, order_id = 13159, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
+        payment2.save()
+        payments = Payment.get_default_paymeng_type();
+        self.assertEqual(len(payments), 2)
+
+
 
 ######################################################################
 #   M A I N
