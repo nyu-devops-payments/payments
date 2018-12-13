@@ -347,6 +347,5 @@ $(function () {
             flash_message(res.responseJSON.message)
         });
 
-    }
-
+      });
 })
