@@ -6,8 +6,7 @@ from behave import *
 from selenium import webdriver
 
 WAIT_SECONDS = 120
-# BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000')
-BASE_URL = os.getenv('BASE_URL', 'https://nyu-payment-service-f18.mybluemix.net')
+BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000')
 
 def before_all(context):
     """ Executed once before all tests """
