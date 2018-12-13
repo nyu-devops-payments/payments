@@ -11,8 +11,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-WAIT_SECONDS = 60
-BASE_URL = getenv('BASE_URL', 'http://localhost:5000/')
+WAIT_SECONDS = 120
+#BASE_URL = getenv('BASE_URL', 'http://localhost:5000')
+BASE_URL = getenv('BASE_URL', 'https://nyu-payment-service-f18.mybluemix.net')
 
 
 @given('the following payments')
@@ -20,8 +21,11 @@ def step_impl(context):
     """ Delete all Payments and load new ones """
     headers = {'Content-Type': 'application/json'}
     context.resp = requests.delete(context.base_url + '/payments/reset', headers=headers)
+    print("URL")
+    print(context.base_url + '/payments/reset')
     expect(context.resp.status_code).to_equal(204)
     create_url = context.base_url + '/payments'
+
     for row in context.table:
         data = {
             "id": row['id'],
