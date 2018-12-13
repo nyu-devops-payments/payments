@@ -323,10 +323,10 @@ $(function () {
 
     });
 
-    // ****************************************
-    // Set as Default Payment Resource (Action)
-    // ****************************************
-
+    // // ****************************************
+    // // Set as Default Payment Resource (Action)
+    // // ****************************************
+    
     $("#action-btn").click(function () {
 
         var id = $("#payment_id").val();

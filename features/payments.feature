@@ -105,7 +105,6 @@ Scenario: Delete a Payment
     And I press the "Delete" button
     Then I should see the message "Payment with ID [6] has been Deleted!"
 
-
 Scenario: Set Default Payment Resource
     When I visit the "Home Page"
     And I set the "id" to "3"
