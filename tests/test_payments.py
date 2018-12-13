@@ -191,7 +191,7 @@ class TestPayments(unittest.TestCase):
         payment1.save()
         payment2 = Payment(customer_id=12310, order_id = 13159, payment_method_type = PaymentMethodType.CREDIT, payment_status = PaymentStatus.PAID,  default_payment_type = True)
         payment2.save()
-        payments = Payment.get_default_paymeng_type();
+        payments = Payment.get_default_payment_type();
         self.assertEqual(len(payments), 2)
 
 
