@@ -80,7 +80,7 @@ $(function () {
             "id": id,
             "customer_id": customer_id,
             "order_id": order_id,
-            "payment_method_type": "DEBIT",
+            "payment_method_type": payment_method_type,
             "payment_status": payment_status,
             "default_payment_type": default_payment_type
         };
@@ -192,7 +192,7 @@ $(function () {
         });
 
         ajax.fail(function (res) {
-            flash_message("Server error!")
+            flash_message("Server Error!")
         });
     });
 
@@ -314,7 +314,7 @@ $(function () {
 
             flash_message("Success");
 
-            
+
         });
 
         ajax.fail(function (res) {
@@ -323,4 +323,5 @@ $(function () {
 
     });
 
+    
 })

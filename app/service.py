@@ -231,11 +231,11 @@ class PaymentCollection(Resource):
 ######################################################################
 @ns.route('/<int:payment_id>/default')
 @ns.param('payment_id', 'The Payment identifier')
-class PurchaseResource(Resource):
-    """ Purchase actions on a Payment """
-    @ns.doc('purchase_payments')
+class PaymentsAction(Resource):
+    """ Performs actions on a Payment Resource"""
+    @ns.doc('set_default_payment')
     @ns.response(404, 'Payment not found')
-    @ns.response(409, 'The Payment is not available for purchase')
+    @ns.response(409, 'The Payment resource does not exist')
     def put(self, payment_id):
         """
         Set default payment source
