@@ -175,6 +175,10 @@ class TestPayments(unittest.TestCase):
         self.assertEqual(payment.payment_status, PaymentStatus.PAID)
         self.assertEqual(payment.default_payment_type, False)
 
+    def test_deserialize_a_payment_missing_data(self):
+        data = {"customer_id":12311, "payment_method_type":PaymentMethodType.CREDIT, "payment_status":PaymentStatus.PAID, "default_payment_type":False}
+        payment = Payment()
+        self.assertRaises(DataValidationError, payment.deserialize, data)
 
     def test_deserialize_bad_data(self):
         """ Test deserialization of bad data """
