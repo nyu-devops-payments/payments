@@ -320,8 +320,33 @@ class TestPaymentServer(unittest.TestCase):
         contentTyp = resp.headers.get('Content-Type', None)
         print(contentTyp)
         self.assertTrue(contentTyp != None)
+        
+        
+    def test_create_bad_payment(self):
+        """ Creates a new bad Payment Request """
+        # save the current number of payments for later comparison
+        all_payments_count = self.get_all_payments_count()
+        # add a new payment method
+        new_payment = dict(customer_id="", order_id="", payment_method_type="", payment_status="",  default_payment_type="")
+        data = json.dumps(new_payment)
+        resp = self.app.post('/payments',
+                             data=data,
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
 
+    def test_update_payment_bad_request(self):
+        """ Update an existing Payment Resource """
+
+        payment = Payment.find_by_order_id('15189')[0];
+        test_payment = dict(customer_id="", order_id = "", payment_method_type = "", payment_status = "",  default_payment_type = "")
+        data = json.dumps(test_payment)
+        resp = self.app.put('/payments/{}'.format(payment.id),
+                               data=data,
+                               content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    
     #
     # def test_internal_server_error(self):
     #     """ Test an Internal Server error """
