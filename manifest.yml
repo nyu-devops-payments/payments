@@ -11,7 +11,9 @@ applications:
   path: .
   disk_quota: 1024M
   buildpack: python_buildpack
-  command: gunicorn --bind=0.0.0.0:$PORT app:app
+  command: python run.py
+  #command: FLASK_APP=app:app flask run --host=0.0.0.0:$PORT
+  #command: gunicorn --bind=0.0.0.0:$PORT app:app
   services:
   - Db2
   env:

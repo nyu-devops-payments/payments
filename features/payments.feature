@@ -104,3 +104,16 @@ Scenario: Delete a Payment
     And I set the "id" to "6"
     And I press the "Delete" button
     Then I should see the message "Payment with ID [6] has been Deleted!"
+
+
+Scenario: Set Default Payment Resource
+    When I visit the "Home Page"
+    And I set the "id" to "1"
+    And I press the "Set-Default-Payment-Method" button
+    Then I should see the message "Payment with ID [1] has been set as Default Payment Resource!"
+    When I press the "Clear" button
+    And I set the "customer_id" to "12302"
+    And I press the "Search" button
+    Then I should see "true" in the results
+    And I should see "false" in the results
+    
