@@ -90,17 +90,19 @@ Scenario: Read a single payment by payment_id
     When I visit the "Home Page"
     And I set the "id" to "3"
     And I press the "Retrieve" button
-    Then I should see "14121" in the "customer_id" field
-    Then I should see "11122" in the "order_id" field
-    Then I should see "CREDIT" in the "payment_method_type" field
-    Then I should see "PAID" in the "payment_status" field
+    Then I should see the message "Success!!"
+    And I should see "14121" in the "customer_id" field
+    And I should see "11122" in the "order_id" field
+    And I should see "CREDIT" in the "payment_method_type" field
+    And I should see "PAID" in the "payment_status" field
     
     
 Scenario: Update a payment
     When I visit the "Home Page"
     And I set the "id" to "4"
     And I press the "Retrieve" button
-    Then I should see "PROCESSING" in the "payment_status" field
+    Then I should see the message "Success!!"
+    And I should see "PROCESSING" in the "payment_status" field
     When I set the "payment_status" to "PAID"
     And I press the "Update" button
     Then I should see the message "Success"
