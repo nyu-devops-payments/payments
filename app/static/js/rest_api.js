@@ -326,8 +326,8 @@ $(function () {
     // // ****************************************
     // // Set as Default Payment Resource (Action)
     // // ****************************************
-    
-    $("#action-btn").click(function () {
+
+    $("#set-default-payment-method-btn").click(function () {
 
         var id = $("#payment_id").val();
 
@@ -347,6 +347,6 @@ $(function () {
             flash_message(res.responseJSON.message)
         });
 
-    }
+    });
 
 })
